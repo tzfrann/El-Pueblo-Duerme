@@ -3658,24 +3658,129 @@ function startNextRound() {
 // ------------------------------------------
 
 function getActiveActions(game) {
-    const actionsSource = game.round === 1 ? ROUND_1_ACTIONS : NEXT_ROUND_ACTIONS;
-    
+
+    const actionsSource =
+        game.round === 1
+            ? ROUND_1_ACTIONS
+            : NEXT_ROUND_ACTIONS;
+
+
     return actionsSource.filter(action => {
-        if (!action.requiresRole && action.type !== "role") return true;
 
-        const roleExistsInGame = Object.values(game.players).some(p => p.role === action.requiresRole && p.alive);
-        if (!roleExistsInGame && action.requiresRole) return false;
+        // --------------------------------------
+        // ACCIONES ESPECIALES
+        // --------------------------------------
 
-        const powers = game.usedPowers || {};
-        if (action.id === "seer" && powers.seer) return false;
-        if (action.id === "magic-wolf" && powers.magicWolf) return false;
-        if (action.id === "mage" && powers.mage) return false;
-        
-        // Si la Bruja ya ha gastado sus dos pociones, nos saltamos su turno
-        if (action.id === "witch" && powers.witchRevive && powers.witchKill) return false;
+        // Los enamorados solamente existen si
+        // Cupido ya ha elegido a dos jugadores.
+        if (action.id === "lovers") {
+
+            const cupidDecision =
+                game.nightActions &&
+                game.nightActions.cupid;
+
+            if (
+                !cupidDecision ||
+                cupidDecision === "skip"
+            ) {
+                return false;
+            }
+
+            const lovers =
+                typeof cupidDecision === "string"
+                    ? cupidDecision.split(",")
+                    : [];
+
+            return lovers.length === 2;
+        }
+
+
+        // --------------------------------------
+        // ACCIONES SIN CARGO
+        // --------------------------------------
+
+        if (
+            !action.requiresRole &&
+            action.type !== "role"
+        ) {
+
+            return true;
+        }
+
+
+        // --------------------------------------
+        // COMPROBAR QUE EL CARGO EXISTE
+        // --------------------------------------
+
+        if (action.requiresRole) {
+
+            const roleExistsInGame =
+                Object.values(
+                    game.players || {}
+                ).some(
+                    player =>
+                        player.role ===
+                            action.requiresRole &&
+                        player.alive
+                );
+
+
+            if (!roleExistsInGame) {
+                return false;
+            }
+
+        }
+
+
+        // --------------------------------------
+        // PODERES DE UN SOLO USO
+        // --------------------------------------
+
+        const powers =
+            game.usedPowers || {};
+
+
+        if (
+            action.id === "seer" &&
+            powers.seer
+        ) {
+            return false;
+        }
+
+
+        if (
+            action.id === "magic-wolf" &&
+            powers.magicWolf
+        ) {
+            return false;
+        }
+
+
+        if (
+            action.id === "mage" &&
+            powers.mage
+        ) {
+            return false;
+        }
+
+
+        // --------------------------------------
+        // BRUJA
+        // --------------------------------------
+
+        if (
+            action.id === "witch" &&
+            powers.witchRevive &&
+            powers.witchKill
+        ) {
+            return false;
+        }
+
 
         return true;
+
     });
+
 }
 
 // ------------------------------------------
