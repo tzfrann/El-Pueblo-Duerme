@@ -18,7 +18,7 @@ import {
 } from
     "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
 
-
+document.addEventListener("DOMContentLoaded", () => {
 const firebaseConfig = {
 
     apiKey:
@@ -5825,3 +5825,4 @@ function addPlayerIdsToLobby() {
 // listenToGame para llamar a initializeGame().
 // ------------------------------------------
 cleanupExpiredGames();
+}
