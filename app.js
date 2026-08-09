@@ -3490,63 +3490,22 @@ function startNextRound() {
 // OBTENER ACCIONES ACTIVAS
 // ------------------------------------------
 
-function getActiveActions() {
+function getActiveActions(game) {
+    const actionsSource = game.round === 1 ? ROUND_1_ACTIONS : NEXT_ROUND_ACTIONS;
+    
+    return actionsSource.filter(action => {
+        if (!action.requiresRole && action.type !== "role") return true;
 
-    return currentRoundActions.filter(
-        action => {
+        const roleExistsInGame = Object.values(game.players).some(p => p.role === action.requiresRole && p.alive);
+        if (!roleExistsInGame && action.requiresRole) return false;
 
-            // Las acciones sin requisito
-            // siempre aparecen.
+        const powers = game.usedPowers || {};
+        if (action.id === "seer" && powers.seer) return false;
+        if (action.id === "magic-wolf" && powers.magicWolf) return false;
+        if (action.id === "mage" && powers.mage) return false;
 
-            if (!action.requiresRole) {
-                return true;
-            }
-
-
-            // ----------------------------------
-            // CAMBIAPFORMAS
-            // ----------------------------------
-
-            if (
-                action.requiresRole ===
-                "shapeshifter"
-            ) {
-
-                return gameConfig
-                    .wolfRoles
-                    .shapeshifter;
-
-            }
-
-
-            // ----------------------------------
-            // LOBO MÁGICO
-            // ----------------------------------
-
-            if (
-                action.requiresRole ===
-                "magic"
-            ) {
-
-                return gameConfig
-                    .wolfRoles
-                    .magic;
-
-            }
-
-
-            // ----------------------------------
-            // RESTO DE ROLES
-            // ----------------------------------
-
-            return gameConfig
-                .villageRoles[
-                    action.requiresRole
-                ] === true;
-
-        }
-    );
-
+        return true;
+    });
 }
 
 
