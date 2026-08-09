@@ -4213,6 +4213,29 @@ async function nextAction() {
                 if (finalDecision.revive) updates[`usedPowers/witchRevive`] = true;
                 if (finalDecision.kill) updates[`usedPowers/witchKill`] = true;
             }
+
+            // --- NUEVO: ABSORCIÓN DE ROLES (CAMBIAFORMAS Y JOKER) ---
+            if ((currentAction.id === "shapeshifter" || currentAction.id === "joker") && finalDecision !== "skip") {
+                // Las sobras vienen en formato "vidente-0", nos quedamos solo con "vidente"
+                const chosenRole = finalDecision.split("-")[0]; 
+                
+                // Buscamos quién es el jugador que acaba de usar esta acción
+                const playerId = Object.keys(game.players).find(id => game.players[id].role === currentAction.requiresRole);
+                
+                if (playerId) {
+                    // 1. Le asignamos su nueva identidad
+                    updates[`players/${playerId}/role`] = chosenRole;
+                    
+                    // 2. Quitamos el rol de las sobras para que nadie más lo robe
+                    const newUnusedRoles = game.unusedRoles ? [...game.unusedRoles] : [];
+                    const roleIndex = newUnusedRoles.indexOf(chosenRole);
+                    if (roleIndex > -1) {
+                        newUnusedRoles.splice(roleIndex, 1);
+                        updates["unusedRoles"] = newUnusedRoles;
+                    }
+                }
+            }
+            // --------------------------------------------------------
         }
 
         const isLastAction = game.currentActionIndex >= activeActions.length - 1;
@@ -4220,7 +4243,7 @@ async function nextAction() {
         if (isLastAction) {
             if (game.phase === "night") {
                 updates["phase"] = "day";
-                processDawn(game, updates); // <--- AQUÍ LLAMAMOS A LA CALCULADORA
+                processDawn(game, updates); 
             } else if (game.phase === "voting") {
                 // --- CALCULADORA DE VOTOS ---
                 const votes = game.votes || {};
@@ -4239,7 +4262,7 @@ async function nextAction() {
                         expelledId = id;
                         tie = false;
                     } else if (id !== "blanco" && count === maxVotes) {
-                        tie = true; // Hay empate, no muere nadie
+                        tie = true; 
                     }
                 }
                 
@@ -4265,7 +4288,6 @@ async function nextAction() {
         console.error("Error al avanzar la acción:", error);
     }
 }
-
 
 // ------------------------------------------
 // MODIFICAR LISTA DE JUGADORES
