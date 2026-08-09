@@ -1,37 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>El Pueblo Duerme</title>
 
-<link rel="stylesheet" href="style.css">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>El Pueblo Duerme</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
 
 <main class="container">
 
-    <!-- =========================
-         PANTALLA PRINCIPAL
-    ========================== -->
 
-    <section id="home-screen" class="screen">
+    <!-- ==========================================
+         PANTALLA PRINCIPAL
+    =========================================== -->
+
+    <section
+        id="home-screen"
+        class="screen"
+    >
 
         <div class="logo-area">
-            <div class="moon">☾</div>
 
-            <h1>El Pueblo Duerme</h1>
+            <div class="moon">
+                ☾
+            </div>
+
+            <h1>
+                El Pueblo Duerme
+            </h1>
 
             <p class="subtitle">
                 Un pueblo. Una noche. Nadie está a salvo.
             </p>
+
         </div>
+
 
         <div class="menu">
 
-            <button id="create-game-btn" class="primary-btn">
+            <button
+                id="create-game-btn"
+                class="primary-btn"
+            >
                 Crear partida
             </button>
 
-            <button id="join-game-btn" class="secondary-btn">
+
+            <button
+                id="join-game-btn"
+                class="secondary-btn"
+            >
                 Unirse a una partida
             </button>
 
@@ -40,25 +70,38 @@
     </section>
 
 
-    <!-- =========================
+
+    <!-- ==========================================
          CREAR PARTIDA
-    ========================== -->
+    =========================================== -->
 
-    <section id="create-screen" class="screen hidden">
+    <section
+        id="create-screen"
+        class="screen hidden"
+    >
 
-        <button class="back-btn" id="create-back-btn">
+        <button
+            class="back-btn"
+            id="create-back-btn"
+        >
             ← Volver
         </button>
 
-        <h2>Crear partida</h2>
+
+        <h2>
+            Crear partida
+        </h2>
+
 
         <p class="screen-description">
             Tú serás el narrador de esta partida.
         </p>
 
+
         <label for="host-name">
             Tu nombre
         </label>
+
 
         <input
             type="text"
@@ -68,32 +111,49 @@
             autocomplete="off"
         >
 
-        <button id="create-confirm-btn" class="primary-btn">
+
+        <button
+            id="create-confirm-btn"
+            class="primary-btn"
+        >
             Crear partida
         </button>
 
     </section>
 
 
-    <!-- =========================
+
+    <!-- ==========================================
          UNIRSE A PARTIDA
-    ========================== -->
+    =========================================== -->
 
-    <section id="join-screen" class="screen hidden">
+    <section
+        id="join-screen"
+        class="screen hidden"
+    >
 
-        <button class="back-btn" id="join-back-btn">
+        <button
+            class="back-btn"
+            id="join-back-btn"
+        >
             ← Volver
         </button>
 
-        <h2>Unirse a una partida</h2>
+
+        <h2>
+            Unirse a una partida
+        </h2>
+
 
         <p class="screen-description">
             Introduce el código que te ha dado el narrador.
         </p>
 
+
         <label for="game-code">
             Código de partida
         </label>
+
 
         <input
             type="text"
@@ -104,9 +164,11 @@
             autocapitalize="characters"
         >
 
+
         <label for="player-name">
             Tu nombre
         </label>
+
 
         <input
             type="text"
@@ -116,18 +178,26 @@
             autocomplete="off"
         >
 
-        <button id="join-confirm-btn" class="primary-btn">
+
+        <button
+            id="join-confirm-btn"
+            class="primary-btn"
+        >
             Unirse
         </button>
 
     </section>
 
 
-    <!-- =========================
-         SALA DE ESPERA
-    ========================== -->
 
-    <section id="lobby-screen" class="screen hidden">
+    <!-- ==========================================
+         SALA DE ESPERA
+    =========================================== -->
+
+    <section
+        id="lobby-screen"
+        class="screen hidden"
+    >
 
         <div class="game-header">
 
@@ -135,11 +205,16 @@
                 CÓDIGO DE PARTIDA
             </p>
 
+
             <div class="code-container">
 
-                <div id="game-code-display" class="game-code">
+                <div
+                    id="game-code-display"
+                    class="game-code"
+                >
                     -----
                 </div>
+
 
                 <button
                     id="copy-code-btn"
@@ -157,29 +232,42 @@
         <div class="lobby-title-row">
 
             <div>
-                <h2>Sala de espera</h2>
+
+                <h2>
+                    Sala de espera
+                </h2>
+
 
                 <p id="player-count">
                     0 jugadores
                 </p>
+
             </div>
 
         </div>
 
 
-        <div id="players-list" class="players-list">
-            <!-- Jugadores generados por JavaScript -->
+        <div
+            id="players-list"
+            class="players-list"
+        >
         </div>
 
 
-        <div id="host-message" class="host-message hidden">
+        <div
+            id="host-message"
+            class="host-message hidden"
+        >
             Eres el narrador. Cuando todos estén preparados,
-            puedes configurar la partida.
+            puedes comenzar la configuración.
         </div>
 
 
-        <div id="waiting-message" class="waiting-message hidden">
-            Esperando a que el narrador configure la partida...
+        <div
+            id="waiting-message"
+            class="waiting-message hidden"
+        >
+            Esperando a que el narrador comience la partida...
         </div>
 
 
@@ -191,375 +279,411 @@
         </button>
 
 
-        <button id="leave-game-btn" class="leave-btn">
+        <button
+            id="leave-game-btn"
+            class="leave-btn"
+        >
             Salir de la partida
         </button>
 
     </section>
 
 
-    <!-- =========================
-         CONFIGURACIÓN DE PARTIDA
-    ========================== -->
 
-    <section id="config-screen" class="screen hidden">
+    <!-- ==========================================
+         CONFIGURACIÓN
+    =========================================== -->
 
-        <button class="back-btn" id="config-back-btn">
-            ← Volver a la sala
+    <section
+        id="config-screen"
+        class="screen hidden"
+    >
+
+        <button
+            class="back-btn"
+            id="config-back-btn"
+        >
+            ← Volver
         </button>
 
-        <h2>Configurar partida</h2>
+
+        <h2>
+            Configurar partida
+        </h2>
+
 
         <p class="screen-description">
-            Configura los cargos y las reglas antes de comenzar.
+            Elige cuántos cargos habrá disponibles.
+            Los cargos sobrantes no se repartirán.
         </p>
 
 
-        <!-- =========================
-             RESUMEN DE JUGADORES
-        ========================== -->
-
-        <div class="config-summary">
-
-            <div class="summary-item">
-                <span>Jugadores</span>
-                <strong id="config-player-count">0</strong>
-            </div>
-
-            <div class="summary-item">
-                <span>Lobos</span>
-                <strong id="config-wolf-count-display">3</strong>
-            </div>
-
-            <div class="summary-item">
-                <span>Pueblo</span>
-                <strong id="config-villager-count-display">0</strong>
-            </div>
-
-        </div>
-
-
-        <!-- =========================
-             NÚMERO DE LOBOS
-        ========================== -->
+        <!-- JUGADORES -->
 
         <div class="config-section">
 
-            <h3>🐺 Número de lobos</h3>
-
-            <div class="number-control">
-
-                <button
-                    type="button"
-                    class="number-btn"
-                    id="wolves-minus"
-                >
-                    −
-                </button>
-
-                <span id="wolves-value">
-                    3
-                </span>
-
-                <button
-                    type="button"
-                    class="number-btn"
-                    id="wolves-plus"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
+            <h3>
+                Jugadores
+            </h3>
 
 
-        <!-- =========================
-             PUEBLERINOS
-        ========================== -->
+            <div class="config-info">
 
-        <div class="config-section">
+                Jugadores en la partida:
 
-            <h3>🧑‍🌾 Pueblerinos rasos</h3>
-
-            <div class="number-control">
-
-                <button
-                    type="button"
-                    class="number-btn"
-                    id="villagers-minus"
-                >
-                    −
-                </button>
-
-                <span id="villagers-value">
+                <strong id="config-player-count">
                     0
-                </span>
-
-                <button
-                    type="button"
-                    class="number-btn"
-                    id="villagers-plus"
-                >
-                    +
-                </button>
+                </strong>
 
             </div>
-
-            <p class="config-help">
-                Se añadirán tantos pueblerinos al pool del pueblo
-                como indique el narrador.
-            </p>
 
         </div>
 
 
-        <!-- =========================
-             CARGOS DE LOBOS
-        ========================== -->
+
+        <!-- LOBOS -->
 
         <div class="config-section">
 
-            <h3>🐺 Cargos especiales de los lobos</h3>
+            <h3>
+                Lobos
+            </h3>
 
-            <div class="role-options">
+
+            <div class="counter-row">
+
+                <span>
+                    Lobos comunes
+                </span>
+
+
+                <div class="counter">
+
+                    <button
+                        id="wolves-minus"
+                        class="counter-btn"
+                    >
+                        −
+                    </button>
+
+
+                    <span
+                        id="wolves-value"
+                        class="counter-value"
+                    >
+                        3
+                    </span>
+
+
+                    <button
+                        id="wolves-plus"
+                        class="counter-btn"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="role-list">
+
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-shapeshifter"
                         checked
                     >
+
                     <span>
-                        <strong>Lobo cambiaformas</strong>
-                        <small>
-                            Puede adoptar un cargo de pueblo
-                            que haya quedado fuera.
-                        </small>
+                        Lobo cambiaformas
                     </span>
+
                 </label>
 
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-lookout-wolf"
                         checked
                     >
+
                     <span>
-                        <strong>Lobo mirona</strong>
-                        <small>
-                            Puede mirar durante los turnos del pueblo.
-                        </small>
+                        Mirona
                     </span>
+
                 </label>
 
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-magic-wolf"
                         checked
                     >
+
                     <span>
-                        <strong>Lobo mágico</strong>
-                        <small>
-                            Puede desactivar los poderes de una noche.
-                        </small>
+                        Lobo mágico
                     </span>
+
                 </label>
 
             </div>
 
+
+            <p class="pool-info">
+
+                Pool de lobos:
+
+                <strong id="wolf-pool-count">
+                    0 cargos
+                </strong>
+
+            </p>
+
         </div>
 
 
-        <!-- =========================
-             CARGOS DEL PUEBLO
-        ========================== -->
+
+        <!-- PUEBLO -->
 
         <div class="config-section">
 
-            <h3>🏘️ Cargos especiales del pueblo</h3>
+            <h3>
+                Pueblo
+            </h3>
 
-            <div class="role-options">
+
+            <div class="counter-row">
+
+                <span>
+                    Pueblerinos
+                </span>
+
+
+                <div class="counter">
+
+                    <button
+                        id="villagers-minus"
+                        class="counter-btn"
+                    >
+                        −
+                    </button>
+
+
+                    <span
+                        id="villagers-value"
+                        class="counter-value"
+                    >
+                        0
+                    </span>
+
+
+                    <button
+                        id="villagers-plus"
+                        class="counter-btn"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="role-list">
+
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-girl"
                         checked
                     >
+
                     <span>
-                        <strong>Niña</strong>
-                        <small>
-                            Puede mirar durante el turno de los lobos.
-                        </small>
+                        Niña
                     </span>
+
                 </label>
 
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-seer"
                         checked
                     >
+
                     <span>
-                        <strong>Vidente</strong>
-                        <small>
-                            Puede ver el cargo de un jugador.
-                        </small>
+                        Vidente
                     </span>
+
                 </label>
 
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-cupid"
                         checked
                     >
+
                     <span>
-                        <strong>Cupido</strong>
-                        <small>
-                            Elige a los dos enamorados al comienzo.
-                        </small>
+                        Cupido
                     </span>
+
                 </label>
 
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-witch"
                         checked
                     >
+
                     <span>
-                        <strong>Bruja</strong>
-                        <small>
-                            Tiene una poción de vida y una de muerte.
-                        </small>
+                        Bruja
                     </span>
+
                 </label>
 
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-hunter"
                         checked
                     >
+
                     <span>
-                        <strong>Cazador</strong>
-                        <small>
-                            Al morir puede eliminar a otro jugador.
-                        </small>
+                        Cazador
                     </span>
+
                 </label>
 
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-apprentice"
                         checked
                     >
+
                     <span>
-                        <strong>Aprendiz</strong>
-                        <small>
-                            Adopta el primer cargo especial del pueblo eliminado.
-                        </small>
+                        Aprendiz
                     </span>
+
                 </label>
 
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-mage"
                         checked
                     >
+
                     <span>
-                        <strong>Mago</strong>
-                        <small>
-                            Reinicia los poderes consumidos.
-                        </small>
+                        Mago
                     </span>
+
                 </label>
 
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-joker"
                         checked
                     >
+
                     <span>
-                        <strong>Joker</strong>
-                        <small>
-                            Puede adoptar otro cargo que haya quedado fuera.
-                        </small>
+                        Joker
                     </span>
+
                 </label>
 
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-medium"
                         checked
                     >
+
                     <span>
-                        <strong>Médium</strong>
-                        <small>
-                            Puede ver los cargos de los eliminados.
-                        </small>
+                        Médium
                     </span>
+
                 </label>
 
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-protector"
                         checked
                     >
+
                     <span>
-                        <strong>Escudero</strong>
-                        <small>
-                            Puede proteger a un jugador cada dos noches.
-                        </small>
+                        Protector
                     </span>
+
                 </label>
 
 
                 <label class="role-option">
+
                     <input
                         type="checkbox"
                         id="role-detective"
                         checked
                     >
+
                     <span>
-                        <strong>Detective</strong>
-                        <small>
-                            Puede saber si dos jugadores son del mismo bando.
-                        </small>
+                        Detective
                     </span>
+
                 </label>
 
             </div>
 
+
+            <p class="pool-info">
+
+                Pool del pueblo:
+
+                <strong id="village-pool-count">
+                    0 cargos
+                </strong>
+
+            </p>
+
         </div>
 
 
-        <!-- =========================
-             REGLAS GENERALES
-        ========================== -->
+
+        <!-- REVELAR CARGOS -->
 
         <div class="config-section">
-
-            <h3>⚙️ Reglas generales</h3>
 
             <label class="role-option">
 
@@ -569,11 +693,7 @@
                 >
 
                 <span>
-                    <strong>Revelar cargo al morir</strong>
-                    <small>
-                        El cargo del jugador eliminado será visible
-                        para todos los jugadores.
-                    </small>
+                    Revelar el cargo al morir
                 </span>
 
             </label>
@@ -581,64 +701,61 @@
         </div>
 
 
-        <!-- =========================
-             VALIDACIÓN
-        ========================== -->
+
+        <!-- AVISOS -->
 
         <div
             id="config-warnings"
             class="config-warnings hidden"
         >
-            <!-- Avisos generados por JavaScript -->
         </div>
 
 
-        <!-- =========================
-             POOLS
-        ========================== -->
 
-        <div class="pool-preview">
+        <!-- RESUMEN -->
 
-            <div class="pool-box">
+        <div class="config-summary">
 
-                <h3>Pool de lobos</h3>
+            <div>
+                Lobos:
 
-                <p id="wolf-pool-count">
-                    0 cargos
-                </p>
-
+                <strong id="config-wolf-count-display">
+                    0
+                </strong>
             </div>
 
 
-            <div class="pool-box">
+            <div>
+                Cargos de pueblo:
 
-                <h3>Pool del pueblo</h3>
-
-                <p id="village-pool-count">
-                    0 cargos
-                </p>
-
+                <strong id="config-villager-count-display">
+                    0
+                </strong>
             </div>
 
         </div>
+
 
 
         <button
             id="confirm-config-btn"
             class="primary-btn"
         >
-            Comenzar partida
+            Repartir cargos y comenzar
         </button>
 
     </section>
 
 
-    <!-- =========================
-         PANTALLA DE ESPERA
-         DURANTE CONFIGURACIÓN
-    ========================== -->
 
-    <section id="waiting-config-screen" class="screen hidden">
+    <!-- ==========================================
+         ESPERA DE CONFIGURACIÓN
+    =========================================== -->
+
+    <section
+        id="waiting-config-screen"
+        class="screen hidden"
+    >
 
         <div class="game-started">
 
@@ -646,12 +763,14 @@
                 ☾
             </div>
 
+
             <h2>
-                El narrador está configurando
+                El narrador está preparando la partida
             </h2>
 
+
             <p>
-                En breve comenzará la partida.
+                Espera mientras configura los cargos...
             </p>
 
         </div>
@@ -659,25 +778,138 @@
     </section>
 
 
-    <!-- =========================
-         PANTALLA DE PARTIDA
-    ========================== -->
 
-    <section id="game-screen" class="screen hidden">
+    <!-- ==========================================
+         PARTIDA - JUGADOR
+    =========================================== -->
 
-        <div class="game-started">
+    <section
+        id="game-screen"
+        class="screen hidden"
+    >
 
-            <div class="moon large-moon">
-                ☾
+        <div id="player-game-view">
+
+            <div class="game-phase">
+
+                <span class="phase-label">
+                    NOCHE
+                </span>
+
+
+                <span
+                    id="player-round"
+                    class="round-label"
+                >
+                    1
+                </span>
+
             </div>
 
+
+            <div class="role-card">
+
+                <p class="role-card-label">
+                    TU CARGO
+                </p>
+
+
+                <h2
+                    id="player-role-name"
+                    class="player-role-name"
+                >
+                    —
+                </h2>
+
+
+                <p
+                    id="player-role-description"
+                    class="role-description"
+                >
+                    —
+                </p>
+
+            </div>
+
+
+            <div class="player-status-card">
+
+                <span>
+                    Estado
+                </span>
+
+
+                <strong id="player-alive-status">
+                    Vivo
+                </strong>
+
+            </div>
+
+
+            <div
+                id="player-game-message"
+                class="game-message"
+            >
+                El narrador está preparando la primera noche.
+            </div>
+
+        </div>
+
+
+
+        <!-- ======================================
+             VISTA DEL NARRADOR
+        ======================================= -->
+
+        <div
+            id="host-game-view"
+            class="hidden"
+        >
+
+            <div class="game-phase">
+
+                <span class="phase-label">
+                    NOCHE
+                </span>
+
+
+                <span
+                    id="host-round"
+                    class="round-label"
+                >
+                    1
+                </span>
+
+            </div>
+
+
             <h2>
-                La partida comienza
+                Panel del narrador
             </h2>
 
-            <p>
-                El narrador está preparando la partida...
+
+            <p class="screen-description">
+                Tienes acceso a toda la información de la partida.
             </p>
+
+
+            <div
+                id="host-players-list"
+                class="host-game-players"
+            >
+            </div>
+
+
+            <div class="host-controls">
+
+                <button
+                    id="start-night-btn"
+                    class="primary-btn"
+                >
+                    Comenzar noche
+                </button>
+
+            </div>
 
         </div>
 
@@ -686,7 +918,12 @@
 </main>
 
 
+
 <script
     type="module"
     src="app.js"
 ></script>
+
+</body>
+
+</html>
