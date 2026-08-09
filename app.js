@@ -2813,190 +2813,795 @@ function showPlayerGameView(game) {
 }
 
 function renderPlayerNightAction(game, action, container) {
-    const currentDecision = game.nightActions && game.nightActions[action.id];
-    
+
+    const currentDecision =
+        game.nightActions &&
+        game.nightActions[action.id];
+
+
+    // --------------------------------------
+    // YA HA TOMADO UNA DECISIÓN
+    // --------------------------------------
+
     if (currentDecision) {
-        container.innerHTML = `<strong>¡Decisión enviada!</strong><br>Espera a que el narrador valide la acción en silencio.`;
-        container.style.borderColor = "#9fd0a5";
-        container.style.color = "#9fd0a5";
+
+        container.innerHTML =
+            `
+            <strong>¡Decisión enviada!</strong>
+            <br>
+            Espera a que el narrador valide
+            la acción en silencio.
+            `;
+
+        container.style.borderColor =
+            "#9fd0a5";
+
+        container.style.color =
+            "#9fd0a5";
+
         return;
-    }
-    
-    container.style.borderColor = "#7b5cff";
-    container.style.color = "white";
 
-    // --- INTERFAZ EXCLUSIVA PARA LA BRUJA ---
+    }
+
+
+    container.style.borderColor =
+        "#7b5cff";
+
+    container.style.color =
+        "white";
+
+
+    // ======================================
+    // BRUJA
+    // ======================================
+
     if (action.id === "witch") {
-        const title = document.createElement("p");
-        title.style.marginBottom = "15px";
-        title.innerHTML = `<strong>¡Despierta, Bruja!</strong><br>Tienes dos pociones.`;
+
+        const title =
+            document.createElement("p");
+
+        title.style.marginBottom =
+            "15px";
+
+        title.innerHTML =
+            `
+            <strong>¡Despierta, Bruja!</strong>
+            <br>
+            Tienes dos pociones.
+            `;
+
         container.appendChild(title);
 
-        let decision = { revive: null, kill: null };
-        const wolfTargetId = game.nightActions && game.nightActions.wolves;
-        const wolfTargetName = wolfTargetId && wolfTargetId !== "skip" && game.players[wolfTargetId] ? game.players[wolfTargetId].name : null;
 
+        let decision = {
+
+            revive:
+                null,
+
+            kill:
+                null
+
+        };
+
+
+        const wolfTargetId =
+            game.nightActions &&
+            game.nightActions.wolves;
+
+
+        const wolfTargetName =
+            wolfTargetId &&
+            wolfTargetId !== "skip" &&
+            game.players[wolfTargetId]
+                ? game.players[wolfTargetId].name
+                : null;
+
+
+        // ----------------------------------
         // POCIÓN DE VIDA
-        const reviveDiv = document.createElement("div");
-        reviveDiv.style.marginBottom = "20px"; reviveDiv.style.padding = "15px";
-        reviveDiv.style.background = "#29263a"; reviveDiv.style.borderRadius = "8px";
-        
-        if (game.usedPowers && game.usedPowers.witchRevive) {
-            reviveDiv.innerHTML = `<span style="color:#aaa6b8;">Poción de Vida: Agotada</span>`;
+        // ----------------------------------
+
+        const reviveDiv =
+            document.createElement("div");
+
+        reviveDiv.style.marginBottom =
+            "20px";
+
+        reviveDiv.style.padding =
+            "15px";
+
+        reviveDiv.style.background =
+            "#29263a";
+
+        reviveDiv.style.borderRadius =
+            "8px";
+
+
+        if (
+            game.usedPowers &&
+            game.usedPowers.witchRevive
+        ) {
+
+            reviveDiv.innerHTML =
+                `
+                <span style="color:#aaa6b8;">
+                    Poción de Vida: Agotada
+                </span>
+                `;
+
         } else if (wolfTargetName) {
-            reviveDiv.innerHTML = `<p style="margin-bottom:10px;">Los lobos han atacado a <strong>${wolfTargetName}</strong>.</p>`;
-            const btnRevive = document.createElement("button");
-            btnRevive.className = "action-player-btn";
-            btnRevive.textContent = `💉 Revivir a ${wolfTargetName}`;
-            btnRevive.addEventListener("click", () => {
-                btnRevive.classList.toggle("selected");
-                decision.revive = btnRevive.classList.contains("selected") ? wolfTargetId : null;
-            });
-            reviveDiv.appendChild(btnRevive);
-        } else {
-            reviveDiv.innerHTML = `<span style="color:#aaa6b8;">Nadie ha sido atacado por los lobos.</span>`;
-        }
-        container.appendChild(reviveDiv);
 
+            reviveDiv.innerHTML =
+                `
+                <p style="margin-bottom:10px;">
+                    Los lobos han atacado a
+                    <strong>${wolfTargetName}</strong>.
+                </p>
+                `;
+
+
+            const btnRevive =
+                document.createElement("button");
+
+            btnRevive.className =
+                "action-player-btn";
+
+            btnRevive.textContent =
+                `💉 Revivir a ${wolfTargetName}`;
+
+
+            btnRevive.addEventListener(
+                "click",
+                () => {
+
+                    btnRevive.classList.toggle(
+                        "selected"
+                    );
+
+                    decision.revive =
+                        btnRevive.classList.contains(
+                            "selected"
+                        )
+                            ? wolfTargetId
+                            : null;
+
+                }
+            );
+
+
+            reviveDiv.appendChild(
+                btnRevive
+            );
+
+        } else {
+
+            reviveDiv.innerHTML =
+                `
+                <span style="color:#aaa6b8;">
+                    Nadie ha sido atacado por los lobos.
+                </span>
+                `;
+
+        }
+
+
+        container.appendChild(
+            reviveDiv
+        );
+
+
+        // ----------------------------------
         // POCIÓN DE MUERTE
-        const killDiv = document.createElement("div");
-        killDiv.style.marginBottom = "20px"; killDiv.style.padding = "15px";
-        killDiv.style.background = "#29263a"; killDiv.style.borderRadius = "8px";
+        // ----------------------------------
 
-        if (game.usedPowers && game.usedPowers.witchKill) {
-            killDiv.innerHTML = `<span style="color:#aaa6b8;">Poción de Muerte: Agotada</span>`;
+        const killDiv =
+            document.createElement("div");
+
+        killDiv.style.marginBottom =
+            "20px";
+
+        killDiv.style.padding =
+            "15px";
+
+        killDiv.style.background =
+            "#29263a";
+
+        killDiv.style.borderRadius =
+            "8px";
+
+
+        if (
+            game.usedPowers &&
+            game.usedPowers.witchKill
+        ) {
+
+            killDiv.innerHTML =
+                `
+                <span style="color:#aaa6b8;">
+                    Poción de Muerte: Agotada
+                </span>
+                `;
+
         } else {
-            killDiv.innerHTML = `<p style="margin-bottom:10px;">Poción de Muerte (Opcional):</p>`;
-            const list = document.createElement("div");
-            list.className = "action-player-list";
-            Object.entries(game.players).filter(([id, p]) => p.alive && !p.host).forEach(([id, p]) => {
-                const btnKill = document.createElement("button");
-                btnKill.className = "action-player-btn";
-                btnKill.textContent = `☠️ Matar a ${p.name}`;
-                btnKill.addEventListener("click", () => {
-                    Array.from(list.children).forEach(b => b.classList.remove("selected"));
-                    if (decision.kill === id) {
-                        decision.kill = null; 
-                    } else {
-                        btnKill.classList.add("selected");
-                        decision.kill = id;
-                    }
-                });
-                list.appendChild(btnKill);
-            });
-            killDiv.appendChild(list);
+
+            killDiv.innerHTML =
+                `
+                <p style="margin-bottom:10px;">
+                    Poción de Muerte (Opcional):
+                </p>
+                `;
+
+
+            const list =
+                document.createElement("div");
+
+            list.className =
+                "action-player-list";
+
+
+            Object.entries(
+                game.players
+            )
+            .filter(
+                ([id, p]) =>
+                    p.alive &&
+                    !p.host
+            )
+            .forEach(
+                ([id, p]) => {
+
+                    const btnKill =
+                        document.createElement(
+                            "button"
+                        );
+
+                    btnKill.className =
+                        "action-player-btn";
+
+                    btnKill.textContent =
+                        `☠️ Matar a ${p.name}`;
+
+
+                    btnKill.addEventListener(
+                        "click",
+                        () => {
+
+                            Array.from(
+                                list.children
+                            ).forEach(
+                                button =>
+                                    button.classList.remove(
+                                        "selected"
+                                    )
+                            );
+
+
+                            if (
+                                decision.kill === id
+                            ) {
+
+                                decision.kill =
+                                    null;
+
+                            } else {
+
+                                btnKill.classList.add(
+                                    "selected"
+                                );
+
+                                decision.kill =
+                                    id;
+
+                            }
+
+                        }
+                    );
+
+
+                    list.appendChild(
+                        btnKill
+                    );
+
+                }
+            );
+
+
+            killDiv.appendChild(
+                list
+            );
+
         }
-        container.appendChild(killDiv);
 
-        // BOTÓN CONFIRMAR
-        const confirmBtn = document.createElement("button");
-        confirmBtn.className = "primary-btn";
-        confirmBtn.style.width = "100%";
-        confirmBtn.textContent = "Confirmar decisiones";
-        confirmBtn.addEventListener("click", () => {
-            if (!decision.revive && !decision.kill) {
-                sendNightActionToFirebase(action.id, "skip");
-            } else {
-                sendNightActionToFirebase(action.id, decision);
+
+        container.appendChild(
+            killDiv
+        );
+
+
+        // ----------------------------------
+        // CONFIRMAR BRUJA
+        // ----------------------------------
+
+        const confirmBtn =
+            document.createElement(
+                "button"
+            );
+
+        confirmBtn.className =
+            "primary-btn";
+
+        confirmBtn.style.width =
+            "100%";
+
+        confirmBtn.textContent =
+            "Confirmar decisiones";
+
+
+        confirmBtn.addEventListener(
+            "click",
+            () => {
+
+                if (
+                    !decision.revive &&
+                    !decision.kill
+                ) {
+
+                    sendNightActionToFirebase(
+                        action.id,
+                        "skip"
+                    );
+
+                } else {
+
+                    sendNightActionToFirebase(
+                        action.id,
+                        decision
+                    );
+
+                }
+
             }
-        });
-        container.appendChild(confirmBtn);
+        );
 
-        return; // Termina la UI de la bruja
+
+        container.appendChild(
+            confirmBtn
+        );
+
+
+        return;
+
     }
-    // --- FIN INTERFAZ BRUJA ---
-    // --- INTERFAZ EXCLUSIVA PARA LA MÉDIUM ---
+
+
+    // ======================================
+    // MÉDIUM
+    // ======================================
+
     if (action.id === "medium") {
-        const title = document.createElement("p");
-        title.style.marginBottom = "15px";
-        title.innerHTML = `<strong>¡Despierta, Médium!</strong><br>Aquí tienes el registro de los espíritus.`;
+
+        const title =
+            document.createElement("p");
+
+        title.style.marginBottom =
+            "15px";
+
+        title.innerHTML =
+            `
+            <strong>¡Despierta, Médium!</strong>
+            <br>
+            Aquí tienes el registro de los espíritus.
+            `;
+
         container.appendChild(title);
 
-        const deadPlayers = Object.values(game.players).filter(p => !p.alive && !p.host);
-        const listDiv = document.createElement("div");
-        listDiv.style.marginBottom = "20px"; listDiv.style.padding = "15px";
-        listDiv.style.background = "#29263a"; listDiv.style.borderRadius = "8px";
 
-        if (deadPlayers.length === 0) {
-            listDiv.innerHTML = `<span style="color:#aaa6b8;">Nadie ha muerto todavía.</span>`;
+        const deadPlayers =
+            Object.values(
+                game.players
+            )
+            .filter(
+                player =>
+                    !player.alive &&
+                    !player.host
+            );
+
+
+        const listDiv =
+            document.createElement("div");
+
+        listDiv.style.marginBottom =
+            "20px";
+
+        listDiv.style.padding =
+            "15px";
+
+        listDiv.style.background =
+            "#29263a";
+
+        listDiv.style.borderRadius =
+            "8px";
+
+
+        if (
+            deadPlayers.length === 0
+        ) {
+
+            listDiv.innerHTML =
+                `
+                <span style="color:#aaa6b8;">
+                    Nadie ha muerto todavía.
+                </span>
+                `;
+
         } else {
-            deadPlayers.forEach(dp => {
-                const rName = ROLE_INFO[dp.originalRole || dp.role]?.name || (dp.originalRole || dp.role);
-                listDiv.innerHTML += `<p style="margin-bottom:8px;">💀 <strong>${dp.name}</strong> era: <span style="color:#c7baff;">${rName}</span></p>`;
-            });
+
+            deadPlayers.forEach(
+                deadPlayer => {
+
+                    const role =
+                        deadPlayer.originalRole ||
+                        deadPlayer.role;
+
+
+                    const roleName =
+                        ROLE_INFO[role]
+                            ? ROLE_INFO[role].name
+                            : role;
+
+
+                    listDiv.innerHTML +=
+                        `
+                        <p style="margin-bottom:8px;">
+                            💀
+                            <strong>
+                                ${deadPlayer.name}
+                            </strong>
+                            era:
+                            <span style="color:#c7baff;">
+                                ${roleName}
+                            </span>
+                        </p>
+                        `;
+
+                }
+            );
+
         }
-        container.appendChild(listDiv);
 
-        const closeBtn = document.createElement("button");
-        closeBtn.className = "primary-btn";
-        closeBtn.style.width = "100%";
-        closeBtn.textContent = "Cerrar los ojos";
-        closeBtn.addEventListener("click", () => {
-            sendNightActionToFirebase(action.id, "skip");
-        });
-        container.appendChild(closeBtn);
 
-        return; 
+        container.appendChild(
+            listDiv
+        );
+
+
+        const closeBtn =
+            document.createElement("button");
+
+        closeBtn.className =
+            "primary-btn";
+
+        closeBtn.style.width =
+            "100%";
+
+        closeBtn.textContent =
+            "Cerrar los ojos";
+
+
+        closeBtn.addEventListener(
+            "click",
+            () => {
+
+                sendNightActionToFirebase(
+                    action.id,
+                    "skip"
+                );
+
+            }
+        );
+
+
+        container.appendChild(
+            closeBtn
+        );
+
+
+        return;
+
     }
-    // --- FIN INTERFAZ MÉDIUM ---
 
-    // UI para el resto de roles (Vidente, Lobos, etc.)
-    const title = document.createElement("p");
-    title.style.marginBottom = "15px";
-    title.innerHTML = `<strong>¡Despierta! Es tu turno.</strong><br>${action.description}`;
+
+    // ======================================
+    // RESTO DE ROLES
+    // ======================================
+
+    const title =
+        document.createElement("p");
+
+    title.style.marginBottom =
+        "15px";
+
+    title.innerHTML =
+        `
+        <strong>¡Despierta! Es tu turno.</strong>
+        <br>
+        ${action.description}
+        `;
+
     container.appendChild(title);
 
-    const list = document.createElement("div");
-    list.className = "action-player-list";
 
-    const optionalRoles = ["seer", "magic", "protector", "mage"]; 
-    if (optionalRoles.includes(action.requiresRole)) {
-        const passBtn = document.createElement("button");
-        passBtn.className = "action-player-btn";
-        passBtn.style.backgroundColor = "#4b416f"; 
-        passBtn.textContent = "No usar poder esta noche";
-        passBtn.addEventListener("click", () => sendNightActionToFirebase(action.id, "skip"));
-        list.appendChild(passBtn);
+    const list =
+        document.createElement("div");
+
+    list.className =
+        "action-player-list";
+
+
+    // --------------------------------------
+    // PODERES OPCIONALES
+    // --------------------------------------
+
+    const optionalRoles = [
+        "seer",
+        "magic",
+        "protector",
+        "mage"
+    ];
+
+
+    if (
+        optionalRoles.includes(
+            action.requiresRole
+        )
+    ) {
+
+        const passBtn =
+            document.createElement(
+                "button"
+            );
+
+        passBtn.className =
+            "action-player-btn";
+
+        passBtn.style.backgroundColor =
+            "#4b416f";
+
+        passBtn.textContent =
+            "No usar poder esta noche";
+
+
+        passBtn.addEventListener(
+            "click",
+            () => {
+
+                sendNightActionToFirebase(
+                    action.id,
+                    "skip"
+                );
+
+            }
+        );
+
+
+        list.appendChild(
+            passBtn
+        );
+
     }
+
+
+    // --------------------------------------
+    // OPCIONES
+    // --------------------------------------
 
     let optionsList = [];
-    if (action.targetPlayers) {
-        optionsList = Object.entries(game.players)
-            .filter(([id, p]) => p.alive && !p.host)
-            .map(([id, p]) => ({ id, name: p.name }));
-    } else if (action.targetPool === "village") {
-        const unusedRoles = game.unusedRoles || [];
-        const villageRoles = unusedRoles.filter(role => role !== "wolf" && role !== "shapeshifter" && role !== "lookout" && role !== "magic");
-        optionsList = villageRoles.map((role, idx) => ({ id: `${role}-${idx}`, name: ROLE_INFO[role] ? ROLE_INFO[role].name : role }));
+
+
+    // ACCIONES SOBRE JUGADORES
+
+    if (
+        action.targetPlayers
+    ) {
+
+        optionsList =
+            Object.entries(
+                game.players
+            )
+            .filter(
+                ([id, p]) =>
+                    p.alive &&
+                    !p.host
+            )
+            .map(
+                ([id, p]) => ({
+                    id:
+                        id,
+
+                    name:
+                        p.name
+                })
+            );
+
     }
-    
-    const amount = action.targetPlayers || 1;
+
+
+    // --------------------------------------
+    // POOL DE SOBRAS DEL PUEBLO
+    // --------------------------------------
+
+    else if (
+        action.targetPool ===
+        "village"
+    ) {
+
+        const unusedRoles =
+            game.unusedRoles || [];
+
+
+        /*
+         * IMPORTANTE:
+         *
+         * Aquí NO incluimos ningún cargo
+         * de lobo.
+         *
+         * El pool de sobras del pueblo
+         * solo contiene:
+         *
+         * - Pueblerinos
+         * - Cargos especiales del pueblo
+         *
+         * Nunca:
+         * - Lobo
+         * - Cambiaformas
+         * - Lobo vigía
+         * - Lobo mágico
+         */
+
+        const villageRoles =
+            unusedRoles.filter(
+                role =>
+                    role !== "wolf" &&
+                    role !== "shapeshifter" &&
+                    role !== "lookout" &&
+                    role !== "magic"
+            );
+
+
+        optionsList =
+            villageRoles.map(
+                (role, index) => ({
+
+                    id:
+                        `${role}-${index}`,
+
+                    name:
+                        ROLE_INFO[role]
+                            ? ROLE_INFO[role].name
+                            : role
+
+                })
+            );
+
+    }
+
+
+    // --------------------------------------
+    // SELECCIÓN
+    // --------------------------------------
+
+    const amount =
+        action.targetPlayers ||
+        1;
+
+
     let selectedIds = [];
 
-    optionsList.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.className = "action-player-btn";
-        btn.textContent = opt.name;
-        
-        btn.addEventListener("click", () => {
-            if (amount === 1) {
-                sendNightActionToFirebase(action.id, opt.id);
-            } else {
-                if (selectedIds.includes(opt.id)) {
-                    selectedIds = selectedIds.filter(id => id !== opt.id);
-                    btn.classList.remove("selected");
-                } else if (selectedIds.length < amount) {
-                    selectedIds.push(opt.id);
-                    btn.classList.add("selected");
+
+    optionsList.forEach(
+        option => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.className =
+                "action-player-btn";
+
+
+            button.textContent =
+                option.name;
+
+
+            button.dataset.targetId =
+                option.id;
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    // Una sola elección
+
+                    if (
+                        amount === 1
+                    ) {
+
+                        sendNightActionToFirebase(
+                            action.id,
+                            option.id
+                        );
+
+                        return;
+
+                    }
+
+
+                    // Varias elecciones
+
+                    if (
+                        selectedIds.includes(
+                            option.id
+                        )
+                    ) {
+
+                        selectedIds =
+                            selectedIds.filter(
+                                id =>
+                                    id !==
+                                    option.id
+                            );
+
+                        button.classList.remove(
+                            "selected"
+                        );
+
+                    } else if (
+                        selectedIds.length <
+                        amount
+                    ) {
+
+                        selectedIds.push(
+                            option.id
+                        );
+
+                        button.classList.add(
+                            "selected"
+                        );
+
+                    }
+
+
+                    if (
+                        selectedIds.length ===
+                        amount
+                    ) {
+
+                        sendNightActionToFirebase(
+                            action.id,
+                            selectedIds.join(",")
+                        );
+
+                    }
+
                 }
-                if (selectedIds.length === amount) {
-                    sendNightActionToFirebase(action.id, selectedIds.join(","));
-                }
-            }
-        });
-        list.appendChild(btn);
-    });
-    container.appendChild(list);
+            );
+
+
+            list.appendChild(
+                button
+            );
+
+        }
+    );
+
+
+    container.appendChild(
+        list
+    );
+
 }
 
 async function sendNightActionToFirebase(actionId, targetId) {
@@ -4552,113 +5157,499 @@ document
         "click",
         nextAction
     );
-
 async function nextAction() {
-    if (!isHost || !currentGameCode) return;
-    try {
-        const gameRef = ref(database, `games/${currentGameCode}`);
-        const snapshot = await get(gameRef);
-        const game = snapshot.val();
-        
-        const activeActions = getActiveActions(game); 
-        const currentAction = activeActions[game.currentActionIndex];
-        
-        const selectedBtn = document.querySelector(".action-player-btn.selected");
-        let manualTarget = selectedBtn ? selectedBtn.dataset.targetId : null;
 
-        let finalDecision = game.nightActions ? game.nightActions[currentAction.id] : null;
-        if (manualTarget) finalDecision = manualTarget;
+    if (
+        !isHost ||
+        !currentGameCode
+    ) {
+        return;
+    }
+
+
+    try {
+
+        const gameRef =
+            ref(
+                database,
+                `games/${currentGameCode}`
+            );
+
+
+        const snapshot =
+            await get(gameRef);
+
+
+        const game =
+            snapshot.val();
+
+
+        if (!game) {
+            return;
+        }
+
+
+        const activeActions =
+            getActiveActions(game);
+
+
+        const currentAction =
+            activeActions[
+                game.currentActionIndex
+            ];
+
+
+        if (!currentAction) {
+            return;
+        }
+
+
+        // --------------------------------------
+        // DECISIÓN RECIBIDA DEL JUGADOR
+        // --------------------------------------
+
+        const selectedButton =
+            document.querySelector(
+                ".action-player-btn.selected"
+            );
+
+
+        let manualTarget =
+            selectedButton
+                ? selectedButton.dataset.targetId
+                : null;
+
+
+        let finalDecision =
+            game.nightActions
+                ? game.nightActions[
+                    currentAction.id
+                ]
+                : null;
+
+
+        // La decisión manual del narrador
+        // tiene prioridad.
+
+        if (
+            manualTarget
+        ) {
+
+            finalDecision =
+                manualTarget;
+
+        }
+
 
         const updates = {};
-        if (finalDecision) {
-            updates[`nightActions/${currentAction.id}`] = finalDecision;
-            
-            if (currentAction.id === "seer") updates[`usedPowers/seer`] = true;
-            if (currentAction.id === "magic-wolf") updates[`usedPowers/magicWolf`] = true;
-            
-            // --- NUEVO: El Mago reinicia los poderes de la base de datos ---
-            if (currentAction.id === "mage") {
-                if (finalDecision !== "skip") {
-                    // Resetea todo a false, excepto a sí mismo para no poder volver a usarlo
-                    updates[`usedPowers`] = { 
-                        magicWolf: false, seer: false, mage: true, 
-                        witchRevive: false, witchKill: false 
-                    };
-                } else {
-                    // Si pasa de turno, no gasta su poder
-                    updates[`usedPowers/mage`] = false; 
-                }
-            }
-            // ----------------------------------------------------------------
-            
-            if (currentAction.id === "witch" && finalDecision !== "skip") {
-                if (finalDecision.revive) updates[`usedPowers/witchRevive`] = true;
-                if (finalDecision.kill) updates[`usedPowers/witchKill`] = true;
+
+
+        // --------------------------------------
+        // GUARDAR DECISIÓN
+        // --------------------------------------
+
+        if (
+            finalDecision
+        ) {
+
+            updates[
+                `nightActions/${currentAction.id}`
+            ] =
+                finalDecision;
+
+
+            // ----------------------------------
+            // PODERES DE UN SOLO USO
+            // ----------------------------------
+
+            if (
+                currentAction.id === "seer" &&
+                finalDecision !== "skip"
+            ) {
+
+                updates[
+                    "usedPowers/seer"
+                ] = true;
+
             }
 
-            if ((currentAction.id === "shapeshifter" || currentAction.id === "joker") && finalDecision !== "skip") {
-                const chosenRole = finalDecision.split("-")[0]; 
-                const playerId = Object.keys(game.players).find(id => game.players[id].role === currentAction.requiresRole);
-                
-                if (playerId) {
-                    updates[`players/${playerId}/role`] = chosenRole;
-                    const newUnusedRoles = game.unusedRoles ? [...game.unusedRoles] : [];
-                    const roleIndex = newUnusedRoles.indexOf(chosenRole);
-                    if (roleIndex > -1) {
-                        newUnusedRoles.splice(roleIndex, 1);
-                        updates["unusedRoles"] = newUnusedRoles;
-                    }
-                }
+
+            if (
+                currentAction.id === "magic-wolf" &&
+                finalDecision !== "skip"
+            ) {
+
+                updates[
+                    "usedPowers/magicWolf"
+                ] = true;
+
             }
+
+
+            // ----------------------------------
+            // MAGO
+            // ----------------------------------
+
+            if (
+                currentAction.id === "mage" &&
+                finalDecision !== "skip"
+            ) {
+
+                /*
+                 * El Mago recupera los poderes
+                 * que todavía puedan recuperarse,
+                 * pero su propio poder queda gastado.
+                 */
+
+                updates["usedPowers"] = {
+
+                    magicWolf:
+                        false,
+
+                    seer:
+                        false,
+
+                    mage:
+                        true,
+
+                    witchRevive:
+                        false,
+
+                    witchKill:
+                        false
+
+                };
+
+            }
+
+
+            // ----------------------------------
+            // BRUJA
+            // ----------------------------------
+
+            if (
+                currentAction.id === "witch" &&
+                finalDecision !== "skip"
+            ) {
+
+                if (
+                    finalDecision.revive
+                ) {
+
+                    updates[
+                        "usedPowers/witchRevive"
+                    ] = true;
+
+                }
+
+
+                if (
+                    finalDecision.kill
+                ) {
+
+                    updates[
+                        "usedPowers/witchKill"
+                    ] = true;
+
+                }
+
+            }
+
+
+            // ==================================
+            // CAMBIAFORMAS / JOKER
+            // ==================================
+
+            if (
+                (
+                    currentAction.id ===
+                    "shapeshifter" ||
+                    currentAction.id ===
+                    "joker"
+                ) &&
+                finalDecision !== "skip"
+            ) {
+
+                /*
+                 * El ID tiene esta forma:
+                 *
+                 *     seer-0
+                 *     villager-0
+                 *     joker-0
+                 *
+                 * Por eso solamente necesitamos
+                 * la parte anterior al último "-".
+                 */
+
+                const chosenRole =
+                    finalDecision.substring(
+                        0,
+                        finalDecision.lastIndexOf("-")
+                    );
+
+
+                /*
+                 * Buscamos al jugador mediante
+                 * originalRole, NO mediante role.
+                 *
+                 * Esto es importante porque el
+                 * cambiaformas va a cambiar su role.
+                 */
+
+                const playerId =
+                    Object.keys(
+                        game.players || {}
+                    ).find(
+                        id => {
+
+                            const player =
+                                game.players[id];
+
+
+                            return (
+                                player.alive &&
+                                player.originalRole ===
+                                    currentAction.requiresRole
+                            );
+
+                        }
+                    );
+
+
+                if (
+                    playerId &&
+                    chosenRole
+                ) {
+
+                    /*
+                     * Cambiar el cargo actual.
+                     *
+                     * originalRole NO se toca.
+                     */
+
+                    updates[
+                        `players/${playerId}/role`
+                    ] =
+                        chosenRole;
+
+
+                    /*
+                     * El cargo elegido deja
+                     * de estar en el pool de sobras.
+                     */
+
+                    const newUnusedRoles =
+                        game.unusedRoles
+                            ? [
+                                ...game.unusedRoles
+                            ]
+                            : [];
+
+
+                    const roleIndex =
+                        newUnusedRoles.indexOf(
+                            chosenRole
+                        );
+
+
+                    if (
+                        roleIndex > -1
+                    ) {
+
+                        newUnusedRoles.splice(
+                            roleIndex,
+                            1
+                        );
+
+
+                        updates[
+                            "unusedRoles"
+                        ] =
+                            newUnusedRoles;
+
+                    }
+
+                }
+
+            }
+
         }
 
-        const isLastAction = game.currentActionIndex >= activeActions.length - 1;
 
-        if (isLastAction) {
-            if (game.phase === "night") {
-                updates["phase"] = "day";
-                processDawn(game, updates); 
-            } else if (game.phase === "voting") {
-                const votes = game.votes || {};
+        // ======================================
+        // ¿ÚLTIMA ACCIÓN?
+        // ======================================
+
+        const isLastAction =
+            game.currentActionIndex >=
+            activeActions.length - 1;
+
+
+        if (
+            isLastAction
+        ) {
+
+            // ----------------------------------
+            // NOCHE → DÍA
+            // ----------------------------------
+
+            if (
+                game.phase === "night"
+            ) {
+
+                updates["phase"] =
+                    "day";
+
+
+                processDawn(
+                    game,
+                    updates
+                );
+
+            }
+
+
+            // ----------------------------------
+            // VOTACIÓN → SIGUIENTE NOCHE
+            // ----------------------------------
+
+            else if (
+                game.phase === "voting"
+            ) {
+
+                const votes =
+                    game.votes || {};
+
+
                 const voteCounts = {};
-                Object.values(votes).forEach(votedId => {
-                    voteCounts[votedId] = (voteCounts[votedId] || 0) + 1;
-                });
-                
-                let maxVotes = 0;
-                let expelledId = null;
-                let tie = false;
-                
-                for (const [id, count] of Object.entries(voteCounts)) {
-                    if (id !== "blanco" && count > maxVotes) {
-                        maxVotes = count;
-                        expelledId = id;
-                        tie = false;
-                    } else if (id !== "blanco" && count === maxVotes) {
-                        tie = true; 
+
+
+                Object.values(
+                    votes
+                ).forEach(
+                    votedId => {
+
+                        voteCounts[votedId] =
+                            (
+                                voteCounts[votedId] ||
+                                0
+                            ) + 1;
+
                     }
+                );
+
+
+                let maxVotes = 0;
+
+                let expelledId = null;
+
+                let tie = false;
+
+
+                for (
+                    const [
+                        id,
+                        count
+                    ]
+                    of Object.entries(
+                        voteCounts
+                    )
+                ) {
+
+                    if (
+                        id !== "blanco" &&
+                        count > maxVotes
+                    ) {
+
+                        maxVotes =
+                            count;
+
+                        expelledId =
+                            id;
+
+                        tie =
+                            false;
+
+                    } else if (
+                        id !== "blanco" &&
+                        count === maxVotes
+                    ) {
+
+                        tie =
+                            true;
+
+                    }
+
                 }
-                
-                if (expelledId && !tie) {
-                    updates[`players/${expelledId}/alive`] = false;
-                    updates[`players/${expelledId}/deathNight`] = "voting";
+
+
+                if (
+                    expelledId &&
+                    !tie
+                ) {
+
+                    updates[
+                        `players/${expelledId}/alive`
+                    ] =
+                        false;
+
+
+                    updates[
+                        `players/${expelledId}/deathNight`
+                    ] =
+                        "voting";
+
                 }
-                
-                updates["phase"] = "night";
-                updates["round"] = (game.round || 1) + 1;
-                updates["currentActionIndex"] = 0;
-                updates["nightActions"] = null; 
-                updates["lastNightDeaths"] = null;
-                updates["votes"] = null;
+
+
+                updates["phase"] =
+                    "night";
+
+
+                updates["round"] =
+                    (game.round || 1) + 1;
+
+
+                updates["currentActionIndex"] =
+                    0;
+
+
+                updates["nightActions"] =
+                    null;
+
+
+                updates["lastNightDeaths"] =
+                    null;
+
+
+                updates["votes"] =
+                    null;
+
             }
+
         } else {
-            updates["currentActionIndex"] = game.currentActionIndex + 1;
+
+            updates["currentActionIndex"] =
+                game.currentActionIndex + 1;
+
         }
 
-        await update(gameRef, updates);
+
+        await update(
+            gameRef,
+            updates
+        );
+
+
     } catch (error) {
-        console.error("Error al avanzar la acción:", error);
+
+        console.error(
+            "Error al avanzar la acción:",
+            error
+        );
+
     }
+
 }
 // ------------------------------------------
 // MODIFICAR LISTA DE JUGADORES
