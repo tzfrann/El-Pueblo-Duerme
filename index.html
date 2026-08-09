@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>El Pueblo Duerme</title>
+<title>El Pueblo Duerme</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -158,13 +157,11 @@
         <div class="lobby-title-row">
 
             <div>
-
                 <h2>Sala de espera</h2>
 
                 <p id="player-count">
                     0 jugadores
                 </p>
-
             </div>
 
         </div>
@@ -177,12 +174,12 @@
 
         <div id="host-message" class="host-message hidden">
             Eres el narrador. Cuando todos estén preparados,
-            puedes comenzar la partida.
+            puedes configurar la partida.
         </div>
 
 
         <div id="waiting-message" class="waiting-message hidden">
-            Esperando a que el narrador comience la partida...
+            Esperando a que el narrador configure la partida...
         </div>
 
 
@@ -202,157 +199,174 @@
 
 
     <!-- =========================
-         CONFIGURACIÓN
+         CONFIGURACIÓN DE PARTIDA
     ========================== -->
 
-    <section id="setup-screen" class="screen hidden">
+    <section id="config-screen" class="screen hidden">
 
-        <button class="back-btn" id="setup-back-btn">
-            ← Volver
+        <button class="back-btn" id="config-back-btn">
+            ← Volver a la sala
         </button>
 
         <h2>Configurar partida</h2>
 
         <p class="screen-description">
-            Elige cómo quieres jugar esta partida.
+            Configura los cargos y las reglas antes de comenzar.
         </p>
 
 
-        <!-- JUGADORES -->
+        <!-- =========================
+             RESUMEN DE JUGADORES
+        ========================== -->
 
-        <div class="setup-section">
+        <div class="config-summary">
 
-            <h3>Composición</h3>
-
-            <div class="number-setting">
-
-                <div>
-                    <strong>Jugadores</strong>
-
-                    <span>
-                        Número de personas en la partida
-                    </span>
-                </div>
-
-                <input
-                    type="number"
-                    id="setup-player-count"
-                    min="1"
-                    value="1"
-                >
-
+            <div class="summary-item">
+                <span>Jugadores</span>
+                <strong id="config-player-count">0</strong>
             </div>
 
-
-            <div class="number-setting">
-
-                <div>
-                    <strong>Lobos</strong>
-
-                    <span>
-                        Número de lobos de la partida
-                    </span>
-                </div>
-
-                <input
-                    type="number"
-                    id="setup-wolf-count"
-                    min="1"
-                    value="1"
-                >
-
+            <div class="summary-item">
+                <span>Lobos</span>
+                <strong id="config-wolf-count-display">3</strong>
             </div>
 
+            <div class="summary-item">
+                <span>Pueblo</span>
+                <strong id="config-villager-count-display">0</strong>
+            </div>
 
-            <div class="number-setting">
+        </div>
 
-                <div>
-                    <strong>Pueblerinos</strong>
 
-                    <span>
-                        Cartas de pueblerino raso
-                    </span>
-                </div>
+        <!-- =========================
+             NÚMERO DE LOBOS
+        ========================== -->
 
-                <input
-                    type="number"
-                    id="setup-villager-count"
-                    min="0"
-                    value="0"
+        <div class="config-section">
+
+            <h3>🐺 Número de lobos</h3>
+
+            <div class="number-control">
+
+                <button
+                    type="button"
+                    class="number-btn"
+                    id="wolves-minus"
                 >
+                    −
+                </button>
+
+                <span id="wolves-value">
+                    3
+                </span>
+
+                <button
+                    type="button"
+                    class="number-btn"
+                    id="wolves-plus"
+                >
+                    +
+                </button>
 
             </div>
 
         </div>
 
 
-        <!-- ROLES DEL PUEBLO -->
+        <!-- =========================
+             PUEBLERINOS
+        ========================== -->
 
-        <div class="setup-section">
+        <div class="config-section">
 
-            <h3>Cargos del pueblo</h3>
+            <h3>🧑‍🌾 Pueblerinos rasos</h3>
 
-            <p class="setup-help">
-                Los cargos seleccionados entrarán en el pool
-                y se sortearán entre los jugadores.
+            <div class="number-control">
+
+                <button
+                    type="button"
+                    class="number-btn"
+                    id="villagers-minus"
+                >
+                    −
+                </button>
+
+                <span id="villagers-value">
+                    0
+                </span>
+
+                <button
+                    type="button"
+                    class="number-btn"
+                    id="villagers-plus"
+                >
+                    +
+                </button>
+
+            </div>
+
+            <p class="config-help">
+                Se añadirán tantos pueblerinos al pool del pueblo
+                como indique el narrador.
             </p>
 
+        </div>
+
+
+        <!-- =========================
+             CARGOS DE LOBOS
+        ========================== -->
+
+        <div class="config-section">
+
+            <h3>🐺 Cargos especiales de los lobos</h3>
 
             <div class="role-options">
 
                 <label class="role-option">
-                    <input type="checkbox" value="little_girl">
-                    <span>Niña</span>
+                    <input
+                        type="checkbox"
+                        id="role-shapeshifter"
+                        checked
+                    >
+                    <span>
+                        <strong>Lobo cambiaformas</strong>
+                        <small>
+                            Puede adoptar un cargo de pueblo
+                            que haya quedado fuera.
+                        </small>
+                    </span>
                 </label>
 
-                <label class="role-option">
-                    <input type="checkbox" value="seer">
-                    <span>Vidente</span>
-                </label>
 
                 <label class="role-option">
-                    <input type="checkbox" value="cupid">
-                    <span>Cupido</span>
+                    <input
+                        type="checkbox"
+                        id="role-lookout-wolf"
+                        checked
+                    >
+                    <span>
+                        <strong>Lobo mirona</strong>
+                        <small>
+                            Puede mirar durante los turnos del pueblo.
+                        </small>
+                    </span>
                 </label>
 
-                <label class="role-option">
-                    <input type="checkbox" value="witch">
-                    <span>Bruja</span>
-                </label>
 
                 <label class="role-option">
-                    <input type="checkbox" value="hunter">
-                    <span>Cazador</span>
-                </label>
-
-                <label class="role-option">
-                    <input type="checkbox" value="apprentice">
-                    <span>Aprendiz</span>
-                </label>
-
-                <label class="role-option">
-                    <input type="checkbox" value="mage">
-                    <span>Mago</span>
-                </label>
-
-                <label class="role-option">
-                    <input type="checkbox" value="joker">
-                    <span>Joker</span>
-                </label>
-
-                <label class="role-option">
-                    <input type="checkbox" value="medium">
-                    <span>Médium</span>
-                </label>
-
-                <label class="role-option">
-                    <input type="checkbox" value="squire">
-                    <span>Escudero</span>
-                </label>
-
-                <label class="role-option">
-                    <input type="checkbox" value="detective">
-                    <span>Detective</span>
+                    <input
+                        type="checkbox"
+                        id="role-magic-wolf"
+                        checked
+                    >
+                    <span>
+                        <strong>Lobo mágico</strong>
+                        <small>
+                            Puede desactivar los poderes de una noche.
+                        </small>
+                    </span>
                 </label>
 
             </div>
@@ -360,36 +374,206 @@
         </div>
 
 
-        <!-- OPCIONES -->
+        <!-- =========================
+             CARGOS DEL PUEBLO
+        ========================== -->
 
-        <div class="setup-section">
+        <div class="config-section">
 
-            <h3>Reglas</h3>
+            <h3>🏘️ Cargos especiales del pueblo</h3>
 
-            <label class="switch-option">
+            <div class="role-options">
+
+                <label class="role-option">
+                    <input
+                        type="checkbox"
+                        id="role-girl"
+                        checked
+                    >
+                    <span>
+                        <strong>Niña</strong>
+                        <small>
+                            Puede mirar durante el turno de los lobos.
+                        </small>
+                    </span>
+                </label>
+
+
+                <label class="role-option">
+                    <input
+                        type="checkbox"
+                        id="role-seer"
+                        checked
+                    >
+                    <span>
+                        <strong>Vidente</strong>
+                        <small>
+                            Puede ver el cargo de un jugador.
+                        </small>
+                    </span>
+                </label>
+
+
+                <label class="role-option">
+                    <input
+                        type="checkbox"
+                        id="role-cupid"
+                        checked
+                    >
+                    <span>
+                        <strong>Cupido</strong>
+                        <small>
+                            Elige a los dos enamorados al comienzo.
+                        </small>
+                    </span>
+                </label>
+
+
+                <label class="role-option">
+                    <input
+                        type="checkbox"
+                        id="role-witch"
+                        checked
+                    >
+                    <span>
+                        <strong>Bruja</strong>
+                        <small>
+                            Tiene una poción de vida y una de muerte.
+                        </small>
+                    </span>
+                </label>
+
+
+                <label class="role-option">
+                    <input
+                        type="checkbox"
+                        id="role-hunter"
+                        checked
+                    >
+                    <span>
+                        <strong>Cazador</strong>
+                        <small>
+                            Al morir puede eliminar a otro jugador.
+                        </small>
+                    </span>
+                </label>
+
+
+                <label class="role-option">
+                    <input
+                        type="checkbox"
+                        id="role-apprentice"
+                        checked
+                    >
+                    <span>
+                        <strong>Aprendiz</strong>
+                        <small>
+                            Adopta el primer cargo especial del pueblo eliminado.
+                        </small>
+                    </span>
+                </label>
+
+
+                <label class="role-option">
+                    <input
+                        type="checkbox"
+                        id="role-mage"
+                        checked
+                    >
+                    <span>
+                        <strong>Mago</strong>
+                        <small>
+                            Reinicia los poderes consumidos.
+                        </small>
+                    </span>
+                </label>
+
+
+                <label class="role-option">
+                    <input
+                        type="checkbox"
+                        id="role-joker"
+                        checked
+                    >
+                    <span>
+                        <strong>Joker</strong>
+                        <small>
+                            Puede adoptar otro cargo que haya quedado fuera.
+                        </small>
+                    </span>
+                </label>
+
+
+                <label class="role-option">
+                    <input
+                        type="checkbox"
+                        id="role-medium"
+                        checked
+                    >
+                    <span>
+                        <strong>Médium</strong>
+                        <small>
+                            Puede ver los cargos de los eliminados.
+                        </small>
+                    </span>
+                </label>
+
+
+                <label class="role-option">
+                    <input
+                        type="checkbox"
+                        id="role-protector"
+                        checked
+                    >
+                    <span>
+                        <strong>Escudero</strong>
+                        <small>
+                            Puede proteger a un jugador cada dos noches.
+                        </small>
+                    </span>
+                </label>
+
+
+                <label class="role-option">
+                    <input
+                        type="checkbox"
+                        id="role-detective"
+                        checked
+                    >
+                    <span>
+                        <strong>Detective</strong>
+                        <small>
+                            Puede saber si dos jugadores son del mismo bando.
+                        </small>
+                    </span>
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             REGLAS GENERALES
+        ========================== -->
+
+        <div class="config-section">
+
+            <h3>⚙️ Reglas generales</h3>
+
+            <label class="role-option">
 
                 <input
                     type="checkbox"
-                    id="setup-secret-voting"
-                    checked
+                    id="reveal-roles"
                 >
 
                 <span>
-                    Votación secreta
-                </span>
-
-            </label>
-
-
-            <label class="switch-option">
-
-                <input
-                    type="checkbox"
-                    id="setup-reveal-roles"
-                >
-
-                <span>
-                    Revelar cargo al morir
+                    <strong>Revelar cargo al morir</strong>
+                    <small>
+                        El cargo del jugador eliminado será visible
+                        para todos los jugadores.
+                    </small>
                 </span>
 
             </label>
@@ -397,21 +581,86 @@
         </div>
 
 
-        <div id="setup-error" class="setup-error hidden"></div>
+        <!-- =========================
+             VALIDACIÓN
+        ========================== -->
+
+        <div
+            id="config-warnings"
+            class="config-warnings hidden"
+        >
+            <!-- Avisos generados por JavaScript -->
+        </div>
+
+
+        <!-- =========================
+             POOLS
+        ========================== -->
+
+        <div class="pool-preview">
+
+            <div class="pool-box">
+
+                <h3>Pool de lobos</h3>
+
+                <p id="wolf-pool-count">
+                    0 cargos
+                </p>
+
+            </div>
+
+
+            <div class="pool-box">
+
+                <h3>Pool del pueblo</h3>
+
+                <p id="village-pool-count">
+                    0 cargos
+                </p>
+
+            </div>
+
+        </div>
 
 
         <button
-            id="generate-game-btn"
+            id="confirm-config-btn"
             class="primary-btn"
         >
-            Generar partida
+            Comenzar partida
         </button>
 
     </section>
 
 
     <!-- =========================
-         PARTIDA
+         PANTALLA DE ESPERA
+         DURANTE CONFIGURACIÓN
+    ========================== -->
+
+    <section id="waiting-config-screen" class="screen hidden">
+
+        <div class="game-started">
+
+            <div class="moon large-moon">
+                ☾
+            </div>
+
+            <h2>
+                El narrador está configurando
+            </h2>
+
+            <p>
+                En breve comenzará la partida.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         PANTALLA DE PARTIDA
     ========================== -->
 
     <section id="game-screen" class="screen hidden">
@@ -437,7 +686,7 @@
 </main>
 
 
-<script type="module" src="app.js"></script>
-
-</body>
-</html>
+<script
+    type="module"
+    src="app.js"
+></script>
