@@ -122,7 +122,10 @@ function getDefaultGameConfig() {
 
         },
 
-        revealRoles: false
+        revealRoles: false,
+        secretVoting: false
+    };
+}
 
     };
 
