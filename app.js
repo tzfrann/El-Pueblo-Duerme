@@ -2542,6 +2542,88 @@ function renderPlayerNightAction(game, action, container) {
     container.style.borderColor = "#7b5cff";
     container.style.color = "white";
 
+    // --- INTERFAZ EXCLUSIVA PARA LA BRUJA ---
+    if (action.id === "witch") {
+        const title = document.createElement("p");
+        title.style.marginBottom = "15px";
+        title.innerHTML = `<strong>¡Despierta, Bruja!</strong><br>Tienes dos pociones.`;
+        container.appendChild(title);
+
+        let decision = { revive: null, kill: null };
+        const wolfTargetId = game.nightActions && game.nightActions.wolves;
+        const wolfTargetName = wolfTargetId && wolfTargetId !== "skip" && game.players[wolfTargetId] ? game.players[wolfTargetId].name : null;
+
+        // POCIÓN DE VIDA
+        const reviveDiv = document.createElement("div");
+        reviveDiv.style.marginBottom = "20px"; reviveDiv.style.padding = "15px";
+        reviveDiv.style.background = "#29263a"; reviveDiv.style.borderRadius = "8px";
+        
+        if (game.usedPowers && game.usedPowers.witchRevive) {
+            reviveDiv.innerHTML = `<span style="color:#aaa6b8;">Poción de Vida: Agotada</span>`;
+        } else if (wolfTargetName) {
+            reviveDiv.innerHTML = `<p style="margin-bottom:10px;">Los lobos han atacado a <strong>${wolfTargetName}</strong>.</p>`;
+            const btnRevive = document.createElement("button");
+            btnRevive.className = "action-player-btn";
+            btnRevive.textContent = `💉 Revivir a ${wolfTargetName}`;
+            btnRevive.addEventListener("click", () => {
+                btnRevive.classList.toggle("selected");
+                decision.revive = btnRevive.classList.contains("selected") ? wolfTargetId : null;
+            });
+            reviveDiv.appendChild(btnRevive);
+        } else {
+            reviveDiv.innerHTML = `<span style="color:#aaa6b8;">Nadie ha sido atacado por los lobos.</span>`;
+        }
+        container.appendChild(reviveDiv);
+
+        // POCIÓN DE MUERTE
+        const killDiv = document.createElement("div");
+        killDiv.style.marginBottom = "20px"; killDiv.style.padding = "15px";
+        killDiv.style.background = "#29263a"; killDiv.style.borderRadius = "8px";
+
+        if (game.usedPowers && game.usedPowers.witchKill) {
+            killDiv.innerHTML = `<span style="color:#aaa6b8;">Poción de Muerte: Agotada</span>`;
+        } else {
+            killDiv.innerHTML = `<p style="margin-bottom:10px;">Poción de Muerte (Opcional):</p>`;
+            const list = document.createElement("div");
+            list.className = "action-player-list";
+            Object.entries(game.players).filter(([id, p]) => p.alive && !p.host).forEach(([id, p]) => {
+                const btnKill = document.createElement("button");
+                btnKill.className = "action-player-btn";
+                btnKill.textContent = `☠️ Matar a ${p.name}`;
+                btnKill.addEventListener("click", () => {
+                    Array.from(list.children).forEach(b => b.classList.remove("selected"));
+                    if (decision.kill === id) {
+                        decision.kill = null; 
+                    } else {
+                        btnKill.classList.add("selected");
+                        decision.kill = id;
+                    }
+                });
+                list.appendChild(btnKill);
+            });
+            killDiv.appendChild(list);
+        }
+        container.appendChild(killDiv);
+
+        // BOTÓN CONFIRMAR
+        const confirmBtn = document.createElement("button");
+        confirmBtn.className = "primary-btn";
+        confirmBtn.style.width = "100%";
+        confirmBtn.textContent = "Confirmar decisiones";
+        confirmBtn.addEventListener("click", () => {
+            if (!decision.revive && !decision.kill) {
+                sendNightActionToFirebase(action.id, "skip");
+            } else {
+                sendNightActionToFirebase(action.id, decision);
+            }
+        });
+        container.appendChild(confirmBtn);
+
+        return; // Termina la UI de la bruja
+    }
+    // --- FIN INTERFAZ BRUJA ---
+
+    // UI para el resto de roles (Vidente, Lobos, etc.)
     const title = document.createElement("p");
     title.style.marginBottom = "15px";
     title.innerHTML = `<strong>¡Despierta! Es tu turno.</strong><br>${action.description}`;
@@ -2550,19 +2632,15 @@ function renderPlayerNightAction(game, action, container) {
     const list = document.createElement("div");
     list.className = "action-player-list";
 
-    // --- NUEVO: Botón de "Pasar turno" para poderes opcionales ---
-    const optionalRoles = ["seer", "magic", "protector", "mage", "witch"]; // Roles que pueden no hacer nada
+    const optionalRoles = ["seer", "magic", "protector", "mage"]; 
     if (optionalRoles.includes(action.requiresRole)) {
         const passBtn = document.createElement("button");
         passBtn.className = "action-player-btn";
-        passBtn.style.backgroundColor = "#4b416f"; // Color distinto para que destaque
+        passBtn.style.backgroundColor = "#4b416f"; 
         passBtn.textContent = "No usar poder esta noche";
-        passBtn.addEventListener("click", () => {
-            sendNightActionToFirebase(action.id, "skip");
-        });
+        passBtn.addEventListener("click", () => sendNightActionToFirebase(action.id, "skip"));
         list.appendChild(passBtn);
     }
-    // -------------------------------------------------------------
 
     let optionsList = [];
     if (action.targetPlayers) {
@@ -2572,10 +2650,7 @@ function renderPlayerNightAction(game, action, container) {
     } else if (action.targetPool === "village") {
         const unusedRoles = game.unusedRoles || [];
         const villageRoles = unusedRoles.filter(role => role !== "wolf" && role !== "shapeshifter" && role !== "lookout" && role !== "magic");
-        optionsList = villageRoles.map((role, idx) => ({ 
-            id: `${role}-${idx}`, 
-            name: ROLE_INFO[role] ? ROLE_INFO[role].name : role 
-        }));
+        optionsList = villageRoles.map((role, idx) => ({ id: `${role}-${idx}`, name: ROLE_INFO[role] ? ROLE_INFO[role].name : role }));
     }
     
     const amount = action.targetPlayers || 1;
@@ -2597,7 +2672,6 @@ function renderPlayerNightAction(game, action, container) {
                     selectedIds.push(opt.id);
                     btn.classList.add("selected");
                 }
-                
                 if (selectedIds.length === amount) {
                     sendNightActionToFirebase(action.id, selectedIds.join(","));
                 }
@@ -2605,7 +2679,6 @@ function renderPlayerNightAction(game, action, container) {
         });
         list.appendChild(btn);
     });
-
     container.appendChild(list);
 }
 
@@ -3568,11 +3641,13 @@ function getActiveActions(game) {
         if (action.id === "seer" && powers.seer) return false;
         if (action.id === "magic-wolf" && powers.magicWolf) return false;
         if (action.id === "mage" && powers.mage) return false;
+        
+        // Si la Bruja ya ha gastado sus dos pociones, nos saltamos su turno
+        if (action.id === "witch" && powers.witchRevive && powers.witchKill) return false;
 
         return true;
     });
 }
-
 
 // ------------------------------------------
 // MOSTRAR ACCIÓN ACTUAL
@@ -3735,14 +3810,46 @@ function renderActionContent(action, container, game) {
     
     const currentDecision = game.nightActions && game.nightActions[action.id];
 
-    // --- NUEVO: ¿Ha decidido pasar turno? ---
     if (currentDecision === "skip") {
         title.innerHTML = `<strong style="color:#d98e8e;">Ha decidido NO usar su poder.</strong><br>Pulsa <strong>Validar Acción</strong> para continuar en silencio.`;
         container.appendChild(title);
         return; 
     }
-    // ----------------------------------------
 
+    // --- INTERFAZ BRUJA NARRADOR ---
+    if (action.id === "witch") {
+        title.innerHTML = `Esperando a que <strong>La Bruja</strong> tome sus decisiones...<br><br><span style="font-size:0.85rem; color:#aaa6b8;">(Elegirá en su móvil. Opcionalmente puedes forzar "Pasar").</span>`;
+        
+        if (currentDecision && currentDecision !== "skip") {
+            let msg = `<strong style="color:#9fd0a5;">¡Decisiones recibidas!</strong><br><br>`;
+            if (currentDecision.revive) {
+                const revName = game.players[currentDecision.revive]?.name;
+                msg += `💉 Ha revivido a: <strong>${revName}</strong><br>`;
+            }
+            if (currentDecision.kill) {
+                const killName = game.players[currentDecision.kill]?.name;
+                msg += `☠️ Ha matado a: <strong>${killName}</strong><br>`;
+            }
+            msg += `<br>Pulsa <strong>Validar Acción</strong> para confirmar.`;
+            title.innerHTML = msg;
+        }
+        container.appendChild(title);
+        
+        const skipBtn = document.createElement("button");
+        skipBtn.className = "action-player-btn";
+        skipBtn.textContent = "Forzar: No usar pociones";
+        skipBtn.dataset.targetId = "skip";
+        skipBtn.addEventListener("click", () => {
+            skipBtn.classList.add("selected");
+            title.innerHTML = `Has forzado manualmente que no use pociones.<br>Pulsa <strong>Validar Acción</strong>.`;
+        });
+        container.appendChild(skipBtn);
+
+        return; 
+    }
+    // --- FIN INTERFAZ BRUJA NARRADOR ---
+
+    // Lectura del resto de roles
     title.innerHTML = `Esperando a que <strong>${action.role}</strong> tome una decisión...<br><br><span style="font-size:0.85rem; color:#aaa6b8;">(El jugador elegirá en su móvil).</span>`;
     container.appendChild(title);
 
@@ -3770,14 +3877,12 @@ function renderActionContent(action, container, game) {
             btn.classList.add("selected");
             btn.style.borderColor = "#9fd0a5"; 
             
-            // --- NUEVO: Chivatazos para el Narrador ---
             let chivatazo = "";
             if (action.id === "seer") {
                 const targetRole = game.players[opt.id].role;
                 const roleName = ROLE_INFO[targetRole] ? ROLE_INFO[targetRole].name : targetRole;
                 chivatazo = `<br><span style="color:#c7baff; font-size: 1.1rem;">(Hazle una seña: es <strong>${roleName}</strong>)</span>`;
             }
-            // ------------------------------------------
 
             title.innerHTML = `<strong style="color:#9fd0a5;">¡Decisión recibida!</strong><br>${action.role} ha elegido a ${opt.name}.${chivatazo}<br><br>Pulsa <strong>Validar Acción</strong> para confirmar.`;
         }
@@ -3790,7 +3895,6 @@ function renderActionContent(action, container, game) {
             btn.classList.add("selected");
             title.innerHTML = `Has marcado a ${opt.name} manualmente.<br>Pulsa <strong>Validar Acción</strong> para confirmar.`;
         });
-
         list.appendChild(btn);
     });
 
@@ -4020,7 +4124,6 @@ document
 
 async function nextAction() {
     if (!isHost || !currentGameCode) return;
-
     try {
         const gameRef = ref(database, `games/${currentGameCode}`);
         const snapshot = await get(gameRef);
@@ -4030,14 +4133,25 @@ async function nextAction() {
         const currentAction = activeActions[game.currentActionIndex];
         
         const selectedBtn = document.querySelector(".action-player-btn.selected");
-        let actionTarget = selectedBtn ? selectedBtn.dataset.targetId : null;
+        let manualTarget = selectedBtn ? selectedBtn.dataset.targetId : null;
+
+        // La decisión final es la que envió el móvil, o la que forzó el narrador a mano
+        let finalDecision = game.nightActions ? game.nightActions[currentAction.id] : null;
+        if (manualTarget) finalDecision = manualTarget;
 
         const updates = {};
-        if (actionTarget) {
-            updates[`nightActions/${currentAction.id}`] = actionTarget;
+        if (finalDecision) {
+            updates[`nightActions/${currentAction.id}`] = finalDecision;
             
             if (currentAction.id === "seer") updates[`usedPowers/seer`] = true;
             if (currentAction.id === "magic-wolf") updates[`usedPowers/magicWolf`] = true;
+            if (currentAction.id === "mage") updates[`usedPowers/mage`] = true;
+            
+            // Si es la bruja y no pasó de turno, registramos qué pociones gastó
+            if (currentAction.id === "witch" && finalDecision !== "skip") {
+                if (finalDecision.revive) updates[`usedPowers/witchRevive`] = true;
+                if (finalDecision.kill) updates[`usedPowers/witchKill`] = true;
+            }
         }
 
         const isLastAction = game.currentActionIndex >= activeActions.length - 1;
@@ -4056,7 +4170,6 @@ async function nextAction() {
         }
 
         await update(gameRef, updates);
-
     } catch (error) {
         console.error("Error al avanzar la acción:", error);
     }
