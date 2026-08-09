@@ -2500,8 +2500,8 @@ function showPlayerGameView(game) {
         message.style.borderColor = ""; message.style.color = "";
         return;
     } else if (game.phase === "voting") {
-        message.textContent = "🗳️ Es hora de votar. Debatid y tomad una decisión.";
-        message.style.borderColor = ""; message.style.color = "";
+        // --- NUEVO: Llamamos a la pantalla de votación ---
+        renderPlayerVoting(game, message);
         return;
     }
 
@@ -3693,8 +3693,32 @@ function renderCurrentAction() {
         document.getElementById("action-title").textContent = "🗳️ Votación del pueblo";
         document.getElementById("action-icon").textContent = "🗳️";
         document.getElementById("action-role").textContent = "Pueblo";
-        document.getElementById("action-instruction").textContent = "Los jugadores están debatiendo y votando.";
-        content.innerHTML = "<p class='action-instruction'>Cuando termine el tiempo o todos hayan votado, cierra la votación para pasar a la siguiente noche.</p>";
+        document.getElementById("action-instruction").textContent = "Control de votos en tiempo real.";
+        content.innerHTML = "";
+        
+        const aliveCount = Object.values(game.players).filter(p => p.alive && !p.host).length;
+        const votes = game.votes || {};
+        const voteCount = Object.keys(votes).length;
+        
+        const status = document.createElement("p");
+        status.className = "action-instruction";
+        status.innerHTML = `Han votado <strong>${voteCount}</strong> de <strong>${aliveCount}</strong> jugadores vivos.<br><br>`;
+        
+        // Calcular votos
+        const tally = {};
+        Object.values(votes).forEach(v => { tally[v] = (tally[v] || 0) + 1; });
+        
+        if (game.config.secretVoting) {
+            status.innerHTML += `<span style="color:#aaa6b8;">(La configuración indica Votos Secretos. No puedes ver quién va ganando hasta cerrar la votación).</span>`;
+        } else if (voteCount > 0) {
+            status.innerHTML += `<strong>Escrutinio actual:</strong><br>`;
+            Object.entries(tally).forEach(([targetId, count]) => {
+                const targetName = targetId === "blanco" ? "En Blanco" : (game.players[targetId]?.name || "Desconocido");
+                status.innerHTML += `- ${targetName}: ${count} votos<br>`;
+            });
+        }
+        
+        content.appendChild(status);
         
         const btn = document.getElementById("next-action-btn");
         btn.textContent = "Cerrar Votación y Anochecer";
@@ -4198,11 +4222,39 @@ async function nextAction() {
                 updates["phase"] = "day";
                 processDawn(game, updates); // <--- AQUÍ LLAMAMOS A LA CALCULADORA
             } else if (game.phase === "voting") {
+                // --- CALCULADORA DE VOTOS ---
+                const votes = game.votes || {};
+                const voteCounts = {};
+                Object.values(votes).forEach(votedId => {
+                    voteCounts[votedId] = (voteCounts[votedId] || 0) + 1;
+                });
+                
+                let maxVotes = 0;
+                let expelledId = null;
+                let tie = false;
+                
+                for (const [id, count] of Object.entries(voteCounts)) {
+                    if (id !== "blanco" && count > maxVotes) {
+                        maxVotes = count;
+                        expelledId = id;
+                        tie = false;
+                    } else if (id !== "blanco" && count === maxVotes) {
+                        tie = true; // Hay empate, no muere nadie
+                    }
+                }
+                
+                if (expelledId && !tie) {
+                    updates[`players/${expelledId}/alive`] = false;
+                    updates[`players/${expelledId}/deathNight`] = "voting";
+                }
+                // -----------------------------
+                
                 updates["phase"] = "night";
                 updates["round"] = (game.round || 1) + 1;
                 updates["currentActionIndex"] = 0;
                 updates["nightActions"] = null; 
                 updates["lastNightDeaths"] = null;
+                updates["votes"] = null;
             }
         } else {
             updates["currentActionIndex"] = game.currentActionIndex + 1;
@@ -4301,6 +4353,73 @@ function processDawn(game, updates) {
     // Guardamos la lista de muertos para que el Narrador la lea
     updates["lastNightDeaths"] = killedThisNight;
 }
+
+// ==========================================
+// PANTALLA DE VOTACIÓN (JUGADORES)
+// ==========================================
+function renderPlayerVoting(game, container) {
+    // Si ya he votado, muestro confirmación
+    const myVote = game.votes && game.votes[currentPlayerId];
+    if (myVote) {
+        const votedName = game.players[myVote] ? game.players[myVote].name : "alguien";
+        container.innerHTML = `<strong>¡Voto registrado!</strong><br>Has votado para expulsar a: <span style="color:#d98e8e;">${votedName}</span>.<br>Espera a que el resto termine.`;
+        container.style.borderColor = "#9fd0a5";
+        container.style.color = "#9fd0a5";
+        return;
+    }
+
+    container.style.borderColor = "#d98e8e";
+    container.style.color = "white";
+
+    const title = document.createElement("p");
+    title.style.marginBottom = "15px";
+    title.innerHTML = `<strong>¡Es hora de votar!</strong><br>Selecciona a quién quieres expulsar del pueblo.`;
+    container.appendChild(title);
+
+    const list = document.createElement("div");
+    list.className = "action-player-list";
+
+    // Mostramos a todos los vivos
+    const alivePlayers = Object.entries(game.players).filter(([id, p]) => p.alive && !p.host);
+
+    alivePlayers.forEach(([id, p]) => {
+        const btn = document.createElement("button");
+        btn.className = "action-player-btn";
+        btn.textContent = `Expulsar a ${p.name}`;
+        
+        btn.addEventListener("click", () => {
+            const confirmed = confirm(`¿Seguro que quieres expulsar a ${p.name}?`);
+            if (confirmed) {
+                sendVoteToFirebase(id);
+            }
+        });
+        list.appendChild(btn);
+    });
+    
+    // Botón para votar en blanco
+    const skipBtn = document.createElement("button");
+    skipBtn.className = "action-player-btn";
+    skipBtn.style.backgroundColor = "#4b416f";
+    skipBtn.textContent = "Votar en blanco";
+    skipBtn.addEventListener("click", () => {
+        if(confirm("¿Seguro que quieres votar en blanco?")) sendVoteToFirebase("blanco");
+    });
+    list.appendChild(skipBtn);
+
+    container.appendChild(list);
+}
+
+async function sendVoteToFirebase(targetId) {
+    if (!currentGameCode) return;
+    try {
+        await update(ref(database, `games/${currentGameCode}/votes`), {
+            [currentPlayerId]: targetId
+        });
+    } catch (error) {
+        console.error("Error enviando voto:", error);
+    }
+}
+
 
 function addPlayerIdsToLobby() {
 
