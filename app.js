@@ -2557,20 +2557,15 @@ function showPlayerGameView(game) {
         );
 
 
-    if (
-        game.phase === "night"
-    ) {
-
-        message.textContent =
-            "Es de noche. El narrador está preparando las acciones nocturnas.";
-
-    } else {
-
-        message.textContent =
-            "El pueblo está despierto.";
-
+    if (!game.players[currentPlayerId].alive) {
+        message.textContent = "Has muerto. No puedes hablar ni interactuar.";
+    } else if (game.phase === "night") {
+        message.textContent = "🌙 El pueblo duerme. Cierra los ojos.";
+    } else if (game.phase === "day") {
+        message.textContent = "☀️ El pueblo despierta. Escucha al narrador.";
+    } else if (game.phase === "voting") {
+        message.textContent = "🗳️ Es hora de votar. Debatid y tomad una decisión.";
     }
-
 }
 
 
@@ -3746,183 +3741,7 @@ function renderSelector(container, optionsList, amount, instructionText) {
 
 // ------------------------------------------
 // SELECTOR DE JUGADORES
-// ------------------------------------------
-
-function renderPlayerSelector(
-    container,
-    amount
-) {
-
-    const players =
-        getCurrentPlayers();
-
-
-    const title =
-        document.createElement(
-            "p"
-        );
-
-    title.className =
-        "action-instruction";
-
-    title.textContent =
-        amount === 1
-            ? "Selecciona un jugador."
-            : `Selecciona ${amount} jugadores.`;
-
-    container.appendChild(
-        title
-    );
-
-
-    const list =
-        document.createElement(
-            "div"
-        );
-
-    list.className =
-        "action-player-list";
-
-
-    players.forEach(
-        player => {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.className =
-                "action-player-btn";
-
-            button.textContent =
-                player.name;
-
-
-            button.dataset.playerId =
-                player.id;
-
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    button.classList.toggle(
-                        "selected"
-                    );
-
-                }
-            );
-
-
-            list.appendChild(
-                button
-            );
-
-        }
-    );
-
-
-    container.appendChild(
-        list
-    );
-
-}
-
-
-// ------------------------------------------
-// POOL DE SOBRAS DEL PUEBLO
-// ------------------------------------------
-
-function renderVillageRolePool(
-    container
-) {
-
-    const title =
-        document.createElement(
-            "p"
-        );
-
-    title.className =
-        "action-instruction";
-
-    title.textContent =
-        "Selecciona un cargo del pool de sobras del pueblo.";
-
-    container.appendChild(
-        title
-    );
-
-
-    const pool =
-        getVillageRolePool();
-
-
-    const list =
-        document.createElement(
-            "div"
-        );
-
-    list.className =
-        "action-player-list";
-
-
-    pool.forEach(
-        role => {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.className =
-                "action-player-btn";
-
-            button.textContent =
-                role;
-
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    document
-                        .querySelectorAll(
-                            ".action-player-btn"
-                        )
-                        .forEach(
-                            other => {
-
-                                other.classList.remove(
-                                    "selected"
-                                );
-
-                            }
-                        );
-
-
-                    button.classList.add(
-                        "selected"
-                    );
-
-                }
-            );
-
-
-            list.appendChild(
-                button
-            );
-
-        }
-    );
-
-
-    container.appendChild(
-        list
-    );
-
-}
-
+// Borrado.(?)
 
 // ------------------------------------------
 // OBTENER JUGADORES
