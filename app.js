@@ -66,11 +66,62 @@ let isHost = false;
 
 let currentGameListener = null;
 
+
 // ==========================================
-// CONFIGURACIÓN DE PARTIDAS
+// CONFIGURACIÓN
 // ==========================================
 
-const GAME_DURATION = 3 * 60 * 60 * 1000; // 3 horas
+const GAME_DURATION = 3 * 60 * 60 * 1000;
+
+
+// Valores iniciales
+
+let gameConfig = {
+
+    wolves: 3,
+
+    villagers: 0,
+
+    wolfRoles: {
+
+        shapeshifter: true,
+
+        lookout: true,
+
+        magic: true
+
+    },
+
+    villageRoles: {
+
+        girl: true,
+
+        seer: true,
+
+        cupid: true,
+
+        witch: true,
+
+        hunter: true,
+
+        apprentice: true,
+
+        mage: true,
+
+        joker: true,
+
+        medium: true,
+
+        protector: true,
+
+        detective: true
+
+    },
+
+    revealRoles: false
+
+};
+
 
 // ==========================================
 // NAVEGACIÓN
@@ -85,9 +136,12 @@ function showScreen(screenId) {
         screen.classList.add("hidden");
     });
 
-    document
-        .getElementById(screenId)
-        .classList.remove("hidden");
+    const screen =
+        document.getElementById(screenId);
+
+    if (screen) {
+        screen.classList.remove("hidden");
+    }
 }
 
 
@@ -131,13 +185,25 @@ document
     });
 
 
+document
+    .getElementById("config-back-btn")
+    .addEventListener("click", () => {
+
+        showScreen("lobby-screen");
+
+    });
+
+
 // ==========================================
 // CREAR PARTIDA
 // ==========================================
 
 document
     .getElementById("create-confirm-btn")
-    .addEventListener("click", createGame);
+    .addEventListener(
+        "click",
+        createGame
+    );
 
 
 async function createGame() {
@@ -159,7 +225,9 @@ async function createGame() {
 
     if (name.length < 2) {
 
-        alert("El nombre debe tener al menos 2 caracteres.");
+        alert(
+            "El nombre debe tener al menos 2 caracteres."
+        );
 
         return;
     }
@@ -167,79 +235,110 @@ async function createGame() {
 
     try {
 
-        // Generamos un código que no esté ocupado
         let gameCode;
+
         let gameExists = true;
+
 
         while (gameExists) {
 
-            gameCode = generateGameCode();
+            gameCode =
+                generateGameCode();
 
-            const snapshot = await get(
-                ref(database, `games/${gameCode}`)
-            );
 
-            gameExists = snapshot.exists();
+            const snapshot =
+                await get(
+                    ref(
+                        database,
+                        `games/${gameCode}`
+                    )
+                );
+
+
+            gameExists =
+                snapshot.exists();
+
         }
 
 
-        // Creamos un ID único para el jugador
         const playersRef =
-            ref(database, `games/${gameCode}/players`);
+            ref(
+                database,
+                `games/${gameCode}/players`
+            );
+
 
         const playerRef =
             push(playersRef);
+
 
         const playerId =
             playerRef.key;
 
 
-        currentGameCode = gameCode;
+        currentGameCode =
+            gameCode;
 
-        currentPlayerId = playerId;
+        currentPlayerId =
+            playerId;
 
-        currentPlayerName = name;
+        currentPlayerName =
+            name;
 
         isHost = true;
 
 
         const gameData = {
 
-            hostId: playerId,
+            hostId:
+                playerId,
 
-            status: "waiting",
+            status:
+                "waiting",
 
-            createdAt: Date.now(),
+            createdAt:
+                Date.now(),
 
             players: {
 
                 [playerId]: {
 
-                    name: name,
+                    name:
+                        name,
 
-                    host: true
+                    host:
+                        true
 
                 }
+
             }
 
         };
 
 
-        // Crear partida
         await set(
-            ref(database, `games/${gameCode}`),
+            ref(
+                database,
+                `games/${gameCode}`
+            ),
             gameData
         );
 
 
-        // Si el narrador cierra la pestaña,
-        // de momento NO eliminamos la partida.
-        // Lo gestionaremos mejor más adelante.
+        await onDisconnect(
+            ref(
+                database,
+                `games/${gameCode}`
+            )
+        ).remove();
 
 
         document
-            .getElementById("game-code-display")
-            .textContent = gameCode;
+            .getElementById(
+                "game-code-display"
+            )
+            .textContent =
+                gameCode;
 
 
         setupLobby();
@@ -269,7 +368,10 @@ async function createGame() {
 
 document
     .getElementById("join-confirm-btn")
-    .addEventListener("click", joinGame);
+    .addEventListener(
+        "click",
+        joinGame
+    );
 
 
 async function joinGame() {
@@ -322,7 +424,10 @@ async function joinGame() {
     try {
 
         const gameRef =
-            ref(database, `games/${code}`);
+            ref(
+                database,
+                `games/${code}`
+            );
 
 
         const snapshot =
@@ -343,7 +448,6 @@ async function joinGame() {
             snapshot.val();
 
 
-        // No permitimos entrar si la partida ya ha comenzado
         if (game.status !== "waiting") {
 
             alert(
@@ -354,7 +458,6 @@ async function joinGame() {
         }
 
 
-        // Comprobamos nombres duplicados
         const players =
             game.players || {};
 
@@ -377,50 +480,58 @@ async function joinGame() {
         }
 
 
-        // Crear jugador
         const playersRef =
-            ref(database, `games/${code}/players`);
+            ref(
+                database,
+                `games/${code}/players`
+            );
+
 
         const playerRef =
             push(playersRef);
+
 
         const playerId =
             playerRef.key;
 
 
-        currentGameCode = code;
+        currentGameCode =
+            code;
 
-        currentPlayerId = playerId;
+        currentPlayerId =
+            playerId;
 
-        currentPlayerName = name;
+        currentPlayerName =
+            name;
 
         isHost = false;
 
 
-        const playerData = {
-
-            name: name,
-
-            host: false
-
-        };
-
-
         await set(
             playerRef,
-            playerData
+            {
+
+                name:
+                    name,
+
+                host:
+                    false
+
+            }
         );
 
 
-        // Si este jugador cierra la pestaña,
-        // Firebase eliminará automáticamente
-        // su entrada de la partida.
-        await onDisconnect(playerRef).remove();
+        await onDisconnect(
+            playerRef
+        ).remove();
 
 
         document
-            .getElementById("game-code-display")
-            .textContent = code;
+            .getElementById(
+                "game-code-display"
+            )
+            .textContent =
+                code;
 
 
         setupLobby();
@@ -445,13 +556,16 @@ async function joinGame() {
 
 
 // ==========================================
-// ESCUCHAR CAMBIOS DE LA PARTIDA
+// ESCUCHAR CAMBIOS
 // ==========================================
 
 function listenToGame(gameCode) {
 
     const gameRef =
-        ref(database, `games/${gameCode}`);
+        ref(
+            database,
+            `games/${gameCode}`
+        );
 
 
     currentGameListener =
@@ -463,10 +577,6 @@ function listenToGame(gameCode) {
                     snapshot.val();
 
 
-                // --------------------------------------
-                // La partida ya no existe
-                // --------------------------------------
-
                 if (!game) {
 
                     alert(
@@ -475,19 +585,19 @@ function listenToGame(gameCode) {
 
                     resetGameState();
 
-                    showScreen("home-screen");
+                    showScreen(
+                        "home-screen"
+                    );
 
                     return;
                 }
 
 
-                // --------------------------------------
-                // Comprobar si la partida ha caducado
-                // --------------------------------------
-
                 if (
                     game.createdAt &&
-                    Date.now() - game.createdAt >= GAME_DURATION
+                    Date.now() -
+                    game.createdAt >=
+                    GAME_DURATION
                 ) {
 
                     if (isHost) {
@@ -502,16 +612,15 @@ function listenToGame(gameCode) {
 
                         resetGameState();
 
-                        showScreen("home-screen");
+                        showScreen(
+                            "home-screen"
+                        );
+
                     }
 
                     return;
                 }
 
-
-                // --------------------------------------
-                // Comprobar si seguimos dentro
-                // --------------------------------------
 
                 const players =
                     game.players || {};
@@ -528,26 +637,66 @@ function listenToGame(gameCode) {
 
                     resetGameState();
 
-                    showScreen("home-screen");
+                    showScreen(
+                        "home-screen"
+                    );
 
                     return;
                 }
 
 
                 // --------------------------------------
-                // La partida ha comenzado
+                // CONFIGURANDO
                 // --------------------------------------
 
-                if (game.status === "started") {
+                if (
+                    game.status ===
+                    "configuring"
+                ) {
 
-                    showScreen("game-screen");
+                    if (isHost) {
+
+                        loadConfigFromFirebase(
+                            game
+                        );
+
+                        showScreen(
+                            "config-screen"
+                        );
+
+                        updateConfigurationUI();
+
+                    } else {
+
+                        showScreen(
+                            "waiting-config-screen"
+                        );
+
+                    }
 
                     return;
                 }
 
 
                 // --------------------------------------
-                // Sala de espera
+                // PARTIDA COMENZADA
+                // --------------------------------------
+
+                if (
+                    game.status ===
+                    "started"
+                ) {
+
+                    showScreen(
+                        "game-screen"
+                    );
+
+                    return;
+                }
+
+
+                // --------------------------------------
+                // SALA DE ESPERA
                 // --------------------------------------
 
                 renderLobby(game);
@@ -565,7 +714,9 @@ function listenToGame(gameCode) {
 function setupLobby() {
 
     document
-        .getElementById("game-code-display")
+        .getElementById(
+            "game-code-display"
+        )
         .textContent =
             currentGameCode;
 
@@ -586,29 +737,25 @@ function renderLobby(game) {
         Object.entries(players);
 
 
-    // --------------------------------------
-    // Número de jugadores
-    // --------------------------------------
-
     const playerCount =
         playerArray.length;
 
 
     document
-        .getElementById("player-count")
+        .getElementById(
+            "player-count"
+        )
         .textContent =
             playerCount === 1
                 ? "1 jugador"
                 : `${playerCount} jugadores`;
 
 
-    // --------------------------------------
-    // Lista de jugadores
-    // --------------------------------------
-
     const playersList =
         document
-            .getElementById("players-list");
+            .getElementById(
+                "players-list"
+            );
 
 
     playersList.innerHTML = "";
@@ -618,7 +765,9 @@ function renderLobby(game) {
         ([playerId, player]) => {
 
             const playerElement =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             playerElement.classList.add(
                 "player"
@@ -626,16 +775,19 @@ function renderLobby(game) {
 
 
             const info =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             info.classList.add(
                 "player-info"
             );
 
 
-            // Avatar
             const avatar =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             avatar.classList.add(
                 "player-avatar"
@@ -648,9 +800,10 @@ function renderLobby(game) {
                     .toUpperCase();
 
 
-            // Nombre
             const name =
-                document.createElement("span");
+                document.createElement(
+                    "span"
+                );
 
             name.classList.add(
                 "player-name"
@@ -664,7 +817,9 @@ function renderLobby(game) {
             if (player.host) {
 
                 const badge =
-                    document.createElement("span");
+                    document.createElement(
+                        "span"
+                    );
 
                 badge.classList.add(
                     "host-badge"
@@ -673,29 +828,36 @@ function renderLobby(game) {
                 badge.textContent =
                     " 👑 Narrador";
 
-                name.appendChild(badge);
+                name.appendChild(
+                    badge
+                );
             }
 
 
-            info.appendChild(avatar);
+            info.appendChild(
+                avatar
+            );
 
-            info.appendChild(name);
+            info.appendChild(
+                name
+            );
 
 
-            playerElement.appendChild(info);
+            playerElement.appendChild(
+                info
+            );
 
-
-            // --------------------------------
-            // Botón expulsar
-            // --------------------------------
 
             if (
                 isHost &&
-                playerId !== currentPlayerId
+                playerId !==
+                currentPlayerId
             ) {
 
                 const kickButton =
-                    document.createElement("button");
+                    document.createElement(
+                        "button"
+                    );
 
                 kickButton.classList.add(
                     "kick-btn"
@@ -707,7 +869,8 @@ function renderLobby(game) {
 
                 kickButton.addEventListener(
                     "click",
-                    () => kickPlayer(playerId)
+                    () =>
+                        kickPlayer(playerId)
                 );
 
 
@@ -725,23 +888,25 @@ function renderLobby(game) {
     );
 
 
-    // --------------------------------------
-    // Mensaje según jugador
-    // --------------------------------------
-
     const hostMessage =
         document
-            .getElementById("host-message");
+            .getElementById(
+                "host-message"
+            );
 
 
     const waitingMessage =
         document
-            .getElementById("waiting-message");
+            .getElementById(
+                "waiting-message"
+            );
 
 
     const startButton =
         document
-            .getElementById("start-game-btn");
+            .getElementById(
+                "start-game-btn"
+            );
 
 
     if (isHost) {
@@ -788,7 +953,11 @@ async function kickPlayer(playerId) {
     }
 
 
-    if (playerId === currentPlayerId) {
+    if (
+        playerId ===
+        currentPlayerId
+    ) {
+
         return;
     }
 
@@ -827,18 +996,20 @@ async function kickPlayer(playerId) {
 
 
 // ==========================================
-// EMPEZAR PARTIDA
+// ABRIR CONFIGURACIÓN
 // ==========================================
 
 document
-    .getElementById("start-game-btn")
+    .getElementById(
+        "start-game-btn"
+    )
     .addEventListener(
         "click",
-        startGame
+        openConfiguration
     );
 
 
-async function startGame() {
+async function openConfiguration() {
 
     if (!isHost) {
         return;
@@ -853,16 +1024,844 @@ async function startGame() {
                 `games/${currentGameCode}`
             ),
             {
-                status: "started"
+                status:
+                    "configuring",
+
+                config:
+                    gameConfig
             }
         );
+
 
     } catch (error) {
 
         console.error(error);
 
         alert(
-            "No se ha podido comenzar la partida."
+            "No se ha podido abrir la configuración."
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// CONFIGURACIÓN
+// ==========================================
+
+function loadConfigFromFirebase(game) {
+
+    if (!game.config) {
+        return;
+    }
+
+
+    gameConfig = {
+
+        ...gameConfig,
+
+        ...game.config,
+
+        wolfRoles: {
+
+            ...gameConfig.wolfRoles,
+
+            ...(game.config.wolfRoles || {})
+
+        },
+
+        villageRoles: {
+
+            ...gameConfig.villageRoles,
+
+            ...(game.config.villageRoles || {})
+
+        }
+
+    };
+
+}
+
+
+// ==========================================
+// CONFIGURACIÓN - EVENTOS
+// ==========================================
+
+document
+    .getElementById("wolves-minus")
+    .addEventListener(
+        "click",
+        () => {
+
+            if (
+                gameConfig.wolves > 1
+            ) {
+
+                gameConfig.wolves--;
+
+                updateConfigurationUI();
+
+            }
+
+        }
+    );
+
+
+document
+    .getElementById("wolves-plus")
+    .addEventListener(
+        "click",
+        () => {
+
+            const playerCount =
+                getCurrentPlayerCount();
+
+
+            if (
+                gameConfig.wolves <
+                playerCount - 1
+            ) {
+
+                gameConfig.wolves++;
+
+                updateConfigurationUI();
+
+            }
+
+        }
+    );
+
+
+document
+    .getElementById("villagers-minus")
+    .addEventListener(
+        "click",
+        () => {
+
+            if (
+                gameConfig.villagers > 0
+            ) {
+
+                gameConfig.villagers--;
+
+                updateConfigurationUI();
+
+            }
+
+        }
+    );
+
+
+document
+    .getElementById("villagers-plus")
+    .addEventListener(
+        "click",
+        () => {
+
+            gameConfig.villagers++;
+
+            updateConfigurationUI();
+
+        }
+    );
+
+
+// ==========================================
+// CHECKBOXES
+// ==========================================
+
+const checkboxMap = {
+
+    "role-shapeshifter":
+        ["wolfRoles", "shapeshifter"],
+
+    "role-lookout-wolf":
+        ["wolfRoles", "lookout"],
+
+    "role-magic-wolf":
+        ["wolfRoles", "magic"],
+
+    "role-girl":
+        ["villageRoles", "girl"],
+
+    "role-seer":
+        ["villageRoles", "seer"],
+
+    "role-cupid":
+        ["villageRoles", "cupid"],
+
+    "role-witch":
+        ["villageRoles", "witch"],
+
+    "role-hunter":
+        ["villageRoles", "hunter"],
+
+    "role-apprentice":
+        ["villageRoles", "apprentice"],
+
+    "role-mage":
+        ["villageRoles", "mage"],
+
+    "role-joker":
+        ["villageRoles", "joker"],
+
+    "role-medium":
+        ["villageRoles", "medium"],
+
+    "role-protector":
+        ["villageRoles", "protector"],
+
+    "role-detective":
+        ["villageRoles", "detective"]
+
+};
+
+
+Object.entries(
+    checkboxMap
+).forEach(
+    ([elementId, path]) => {
+
+        document
+            .getElementById(elementId)
+            .addEventListener(
+                "change",
+                event => {
+
+                    gameConfig[path[0]][path[1]] =
+                        event.target.checked;
+
+                    updateConfigurationUI();
+
+                }
+            );
+
+    }
+);
+
+
+document
+    .getElementById(
+        "reveal-roles"
+    )
+    .addEventListener(
+        "change",
+        event => {
+
+            gameConfig.revealRoles =
+                event.target.checked;
+
+            updateConfigurationUI();
+
+        }
+    );
+
+
+// ==========================================
+// ACTUALIZAR UI CONFIGURACIÓN
+// ==========================================
+
+function updateConfigurationUI() {
+
+    const playerCount =
+        getCurrentPlayerCount();
+
+
+    document
+        .getElementById(
+            "config-player-count"
+        )
+        .textContent =
+            playerCount;
+
+
+    document
+        .getElementById(
+            "wolves-value"
+        )
+        .textContent =
+            gameConfig.wolves;
+
+
+    document
+        .getElementById(
+            "villagers-value"
+        )
+        .textContent =
+            gameConfig.villagers;
+
+
+    document
+        .getElementById(
+            "config-wolf-count-display"
+        )
+        .textContent =
+            gameConfig.wolves;
+
+
+    document
+        .getElementById(
+            "config-villager-count-display"
+        )
+        .textContent =
+            gameConfig.villagers;
+
+
+    // Sincronizar checkboxes
+
+    Object.entries(
+        checkboxMap
+    ).forEach(
+        ([elementId, path]) => {
+
+            document
+                .getElementById(
+                    elementId
+                )
+                .checked =
+                    gameConfig[path[0]][path[1]];
+
+        }
+    );
+
+
+    document
+        .getElementById(
+            "reveal-roles"
+        )
+        .checked =
+            gameConfig.revealRoles;
+
+
+    const validation =
+        validateConfiguration();
+
+
+    document
+        .getElementById(
+            "wolf-pool-count"
+        )
+        .textContent =
+            `${validation.wolfPoolSize} cargos`;
+
+
+    document
+        .getElementById(
+            "village-pool-count"
+        )
+        .textContent =
+            `${validation.villagePoolSize} cargos`;
+
+
+    renderConfigurationWarnings(
+        validation
+    );
+
+
+    document
+        .getElementById(
+            "confirm-config-btn"
+        )
+        .disabled =
+            validation.errors.length > 0;
+
+}
+
+
+// ==========================================
+// VALIDAR CONFIGURACIÓN
+// ==========================================
+
+function validateConfiguration() {
+
+    const playerCount =
+        getCurrentPlayerCount();
+
+
+    let wolfPoolSize =
+        gameConfig.wolves;
+
+
+    if (
+        gameConfig.wolfRoles.shapeshifter
+    ) {
+
+        wolfPoolSize++;
+
+    }
+
+
+    if (
+        gameConfig.wolfRoles.lookout
+    ) {
+
+        wolfPoolSize++;
+
+    }
+
+
+    if (
+        gameConfig.wolfRoles.magic
+    ) {
+
+        wolfPoolSize++;
+
+    }
+
+
+    let villageSpecialCount = 0;
+
+
+    Object.values(
+        gameConfig.villageRoles
+    ).forEach(
+        enabled => {
+
+            if (enabled) {
+                villageSpecialCount++;
+            }
+
+        }
+    );
+
+
+    const villagePoolSize =
+        villageSpecialCount +
+        gameConfig.villagers;
+
+
+    const errors = [];
+
+    const warnings = [];
+
+
+    // --------------------------------------
+    // Número de jugadores
+    // --------------------------------------
+
+    if (playerCount < 2) {
+
+        errors.push(
+            "Debe haber al menos 2 jugadores."
+        );
+
+    }
+
+
+    // --------------------------------------
+    // Número de lobos
+    // --------------------------------------
+
+    if (
+        gameConfig.wolves < 1
+    ) {
+
+        errors.push(
+            "Debe haber al menos 1 lobo."
+        );
+
+    }
+
+
+    if (
+        gameConfig.wolves >= playerCount
+    ) {
+
+        errors.push(
+            "No puede haber tantos lobos como jugadores."
+        );
+
+    }
+
+
+    // --------------------------------------
+    // Pool total
+    // --------------------------------------
+
+    const totalPool =
+        wolfPoolSize +
+        villagePoolSize;
+
+
+    if (
+        totalPool <
+        playerCount
+    ) {
+
+        errors.push(
+            `El pool total tiene ${totalPool} cargos, pero hay ${playerCount} jugadores. Debe haber al menos un cargo disponible por jugador.`
+        );
+
+    }
+
+
+    // --------------------------------------
+    // Pueblerinos
+    // --------------------------------------
+
+    if (
+        gameConfig.villagers >
+        playerCount -
+        gameConfig.wolves
+    ) {
+
+        errors.push(
+            "Hay más pueblerinos configurados que jugadores disponibles para el pueblo."
+        );
+
+    }
+
+
+    // --------------------------------------
+    // CAMBIAPFORMAS / JOKER
+    // --------------------------------------
+
+    const villageRolesAvailable =
+        villageSpecialCount +
+        gameConfig.villagers;
+
+
+    if (
+        gameConfig.wolfRoles.shapeshifter &&
+        villageRolesAvailable < 1
+    ) {
+
+        errors.push(
+            "El Lobo cambiaformas está activado, pero no existe ningún cargo de pueblo que pueda quedar fuera del reparto."
+        );
+
+    }
+
+
+    if (
+        gameConfig.villageRoles.joker &&
+        villageRolesAvailable < 2
+    ) {
+
+        warnings.push(
+            "El Joker está activado, pero el pool del pueblo es muy reducido. Puede que no tenga un cargo disponible para elegir."
+        );
+
+    }
+
+
+    // --------------------------------------
+    // REVELACIÓN + MÉDIUM
+    // --------------------------------------
+
+    if (
+        gameConfig.revealRoles &&
+        gameConfig.villageRoles.medium
+    ) {
+
+        warnings.push(
+            "Al revelar los cargos al morir, la Médium deja de tener utilidad. Se recomienda desactivarla."
+        );
+
+    }
+
+
+    // --------------------------------------
+    // PUEBLO SIN CARGOS
+    // --------------------------------------
+
+    if (
+        villagePoolSize === 0
+    ) {
+
+        errors.push(
+            "El pool del pueblo está vacío."
+        );
+
+    }
+
+
+    // --------------------------------------
+    // AVISO SI HAY MUCHOS CARGOS
+    // --------------------------------------
+
+    if (
+        totalPool >
+        playerCount + 10
+    ) {
+
+        warnings.push(
+            `Hay ${totalPool} cargos disponibles para ${playerCount} jugadores. Quedarán bastantes cargos fuera del reparto.`
+        );
+
+    }
+
+
+    return {
+
+        errors,
+
+        warnings,
+
+        wolfPoolSize,
+
+        villagePoolSize,
+
+        totalPool
+
+    };
+
+}
+
+
+// ==========================================
+// MOSTRAR AVISOS
+// ==========================================
+
+function renderConfigurationWarnings(
+    validation
+) {
+
+    const container =
+        document.getElementById(
+            "config-warnings"
+        );
+
+
+    container.innerHTML = "";
+
+
+    if (
+        validation.errors.length === 0 &&
+        validation.warnings.length === 0
+    ) {
+
+        container.classList.add(
+            "hidden"
+        );
+
+        return;
+
+    }
+
+
+    container.classList.remove(
+        "hidden"
+    );
+
+
+    if (
+        validation.errors.length > 0
+    ) {
+
+        container.classList.add(
+            "error"
+        );
+
+
+        const title =
+            document.createElement(
+                "h3"
+            );
+
+        title.textContent =
+            "⚠ No se puede comenzar";
+
+
+        container.appendChild(
+            title
+        );
+
+
+        const list =
+            document.createElement(
+                "ul"
+            );
+
+
+        validation.errors.forEach(
+            message => {
+
+                const item =
+                    document.createElement(
+                        "li"
+                    );
+
+                item.textContent =
+                    message;
+
+                list.appendChild(
+                    item
+                );
+
+            }
+        );
+
+
+        container.appendChild(
+            list
+        );
+
+    } else {
+
+        container.classList.remove(
+            "error"
+        );
+
+    }
+
+
+    if (
+        validation.warnings.length > 0
+    ) {
+
+        const title =
+            document.createElement(
+                "h3"
+            );
+
+        title.textContent =
+            validation.errors.length > 0
+                ? "ℹ Además"
+                : "⚠ Ten en cuenta";
+
+
+        container.appendChild(
+            title
+        );
+
+
+        const list =
+            document.createElement(
+                "ul"
+            );
+
+
+        validation.warnings.forEach(
+            message => {
+
+                const item =
+                    document.createElement(
+                        "li"
+                    );
+
+                item.textContent =
+                    message;
+
+                list.appendChild(
+                    item
+                );
+
+            }
+        );
+
+
+        container.appendChild(
+            list
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// OBTENER NÚMERO DE JUGADORES
+// ==========================================
+
+function getCurrentPlayerCount() {
+
+    return getLobbyPlayerCount();
+
+}
+
+
+function getLobbyPlayerCount() {
+
+    const playersList =
+        document.getElementById(
+            "players-list"
+        );
+
+
+    if (
+        !playersList
+    ) {
+
+        return 0;
+
+    }
+
+
+    return playersList
+        .querySelectorAll(
+            ".player"
+        )
+        .length;
+
+}
+
+
+// ==========================================
+// CONFIRMAR CONFIGURACIÓN
+// ==========================================
+
+document
+    .getElementById(
+        "confirm-config-btn"
+    )
+    .addEventListener(
+        "click",
+        confirmConfiguration
+    );
+
+
+async function confirmConfiguration() {
+
+    if (!isHost) {
+        return;
+    }
+
+
+    const validation =
+        validateConfiguration();
+
+
+    if (
+        validation.errors.length > 0
+    ) {
+
+        alert(
+            "Hay problemas en la configuración. Revísalos antes de comenzar."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        await update(
+            ref(
+                database,
+                `games/${currentGameCode}`
+            ),
+            {
+
+                status:
+                    "started",
+
+                config:
+                    gameConfig
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "No se ha podido comenzar la partida.\n\n" +
+            error.message
         );
 
     }
@@ -875,7 +1874,9 @@ async function startGame() {
 // ==========================================
 
 document
-    .getElementById("copy-code-btn")
+    .getElementById(
+        "copy-code-btn"
+    )
     .addEventListener(
         "click",
         async () => {
@@ -903,13 +1904,16 @@ document
                     button.textContent;
 
 
-                button.textContent = "✓";
+                button.textContent =
+                    "✓";
 
 
                 setTimeout(
                     () => {
+
                         button.textContent =
                             oldText;
+
                     },
                     1500
                 );
@@ -934,7 +1938,9 @@ document
 // ==========================================
 
 document
-    .getElementById("leave-game-btn")
+    .getElementById(
+        "leave-game-btn"
+    )
     .addEventListener(
         "click",
         leaveGame
@@ -965,7 +1971,6 @@ async function leaveGame() {
 
         if (isHost) {
 
-            // El narrador elimina toda la partida
             await remove(
                 ref(
                     database,
@@ -975,8 +1980,6 @@ async function leaveGame() {
 
         } else {
 
-            // Un jugador normal elimina solamente
-            // su propia entrada
             await remove(
                 ref(
                     database,
@@ -989,7 +1992,9 @@ async function leaveGame() {
 
         resetGameState();
 
-        showScreen("home-screen");
+        showScreen(
+            "home-screen"
+        );
 
 
     } catch (error) {
@@ -1019,6 +2024,52 @@ function resetGameState() {
 
     isHost = false;
 
+    gameConfig = {
+
+        wolves: 3,
+
+        villagers: 0,
+
+        wolfRoles: {
+
+            shapeshifter: true,
+
+            lookout: true,
+
+            magic: true
+
+        },
+
+        villageRoles: {
+
+            girl: true,
+
+            seer: true,
+
+            cupid: true,
+
+            witch: true,
+
+            hunter: true,
+
+            apprentice: true,
+
+            mage: true,
+
+            joker: true,
+
+            medium: true,
+
+            protector: true,
+
+            detective: true
+
+        },
+
+        revealRoles: false
+
+    };
+
 }
 
 
@@ -1035,7 +2086,11 @@ function generateGameCode() {
     let code = "";
 
 
-    for (let i = 0; i < 5; i++) {
+    for (
+        let i = 0;
+        i < 5;
+        i++
+    ) {
 
         const index =
             Math.floor(
@@ -1044,13 +2099,16 @@ function generateGameCode() {
             );
 
 
-        code += characters[index];
+        code +=
+            characters[index];
 
     }
 
 
     return code;
+
 }
+
 
 // ==========================================
 // LIMPIAR PARTIDAS CADUCADAS
@@ -1061,7 +2119,10 @@ async function cleanupExpiredGames() {
     try {
 
         const gamesRef =
-            ref(database, "games");
+            ref(
+                database,
+                "games"
+            );
 
 
         const snapshot =
@@ -1081,11 +2142,19 @@ async function cleanupExpiredGames() {
             Date.now();
 
 
-        for (const [gameCode, game] of Object.entries(games)) {
+        for (
+            const [
+                gameCode,
+                game
+            ]
+            of Object.entries(games)
+        ) {
 
             if (
                 game.createdAt &&
-                now - game.createdAt >= GAME_DURATION
+                now -
+                game.createdAt >=
+                GAME_DURATION
             ) {
 
                 console.log(
@@ -1099,7 +2168,9 @@ async function cleanupExpiredGames() {
                         `games/${gameCode}`
                     )
                 );
+
             }
+
         }
 
 
@@ -1113,4 +2184,6 @@ async function cleanupExpiredGames() {
     }
 
 }
+
+
 cleanupExpiredGames();
