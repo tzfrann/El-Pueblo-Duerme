@@ -793,6 +793,7 @@ function listenToGame(gameCode) {
 
                 const game =
                     snapshot.val();
+                window.currentGameData = game;
 
 
                 if (!game) {
@@ -2742,6 +2743,10 @@ function showNarratorGameView(game) {
     } else {
         summaryBox.innerHTML += "Todavía no hay acciones registradas esta noche.";
     }
+// Refrescar el panel de acciones si es de noche
+    if (game.phase === "night") {
+        renderCurrentAction();
+    }
 }
 
 
@@ -3545,28 +3550,36 @@ function getActiveActions(game) {
 // ------------------------------------------
 
 function renderCurrentAction() {
+    if (!window.currentGameData) return;
+    const game = window.currentGameData;
+    
+    const activeActions = getActiveActions(game);
 
-    const activeActions =
-        getActiveActions();
-
-
-    if (
-        currentActionIndex >=
-        activeActions.length
-    ) {
-
-        if (currentRound === 1) {
-
-            startNextRound();
-
-        } else {
-
-            startNextRound();
-
-        }
-
-        return;
+    // Si ya no quedan acciones, no hacemos nada (el cambio al día lo hace nextAction)
+    if (game.currentActionIndex >= activeActions.length) {
+        return; 
     }
+
+    const action = activeActions[game.currentActionIndex];
+
+    document.getElementById("current-round").textContent = game.round;
+    document.getElementById("action-title").textContent = action.title;
+    document.getElementById("action-description").textContent = action.description;
+    document.getElementById("action-icon").textContent = action.icon;
+    document.getElementById("action-role").textContent = action.role;
+    document.getElementById("action-instruction").textContent = action.description;
+    document.getElementById("action-number").textContent = `Acción ${game.currentActionIndex + 1}`;
+    document.getElementById("action-total").textContent = `de ${activeActions.length}`;
+
+    const percentage = ((game.currentActionIndex + 1) / activeActions.length) * 100;
+    document.getElementById("action-progress-fill").style.width = `${percentage}%`;
+
+    const content = document.getElementById("action-content");
+    content.innerHTML = "";
+
+    renderActionContent(action, content, game);
+    updateNextButton(action);
+}
 
 
     const action =
@@ -3680,40 +3693,39 @@ function renderCurrentAction() {
 // CONTENIDO DE CADA ACCIÓN
 // ------------------------------------------
 function renderActionContent(action, container, game) {
-    if (action.type === "narrator") return;
-
-    if (action.targetPlayers) {
-        const alivePlayers = Object.entries(game.players)
-            .filter(([id, p]) => p.alive && !p.host)
-            .map(([id, p]) => ({ id, name: p.name }));
-            
-        renderSelector(container, alivePlayers, action.targetPlayers, "Selecciona a un jugador.");
+    // 1. Acciones genéricas del Narrador (ej: El pueblo duerme)
+    if (action.type === "narrator") {
+        const msg = document.createElement("p");
+        msg.className = "action-instruction";
+        msg.textContent = "Anuncia esto en voz alta y pulsa Siguiente.";
+        container.appendChild(msg);
         return;
     }
 
-    if (action.targetPool === "village") {
-        const unusedRoles = game.unusedRoles || [];
-        const villageRoles = unusedRoles.filter(role => role !== "wolf" && role !== "shapeshifter" && role !== "lookout" && role !== "magic");
-        
-        const options = villageRoles.map((role, idx) => ({ id: `${role}-${idx}`, name: role }));
-        renderSelector(container, options, 1, "Selecciona un cargo sobrante del pueblo.");
-        return;
-    }
-
-    const msg = document.createElement("p");
-    msg.className = "action-instruction";
-    msg.textContent = "El narrador debe resolver esta acción.";
-    container.appendChild(msg);
-}
-
-function renderSelector(container, optionsList, amount, instructionText) {
+    // 2. Interfaz de Validación para Roles
     const title = document.createElement("p");
     title.className = "action-instruction";
-    title.textContent = instructionText;
+    title.innerHTML = `Esperando a que <strong>${action.role}</strong> tome una decisión...<br><br><span style="font-size:0.85rem; color:#aaa6b8;">(El jugador elegirá en su móvil. También puedes marcarlo tú manualmente si juegan señalando con el dedo).</span>`;
     container.appendChild(title);
 
     const list = document.createElement("div");
     list.className = "action-player-list";
+
+    let optionsList = [];
+    
+    // Rellenar botones según si es un jugador o sobras del pueblo
+    if (action.targetPlayers) {
+        optionsList = Object.entries(game.players)
+            .filter(([id, p]) => p.alive && !p.host)
+            .map(([id, p]) => ({ id, name: p.name }));
+    } else if (action.targetPool === "village") {
+        const unusedRoles = game.unusedRoles || [];
+        const villageRoles = unusedRoles.filter(role => role !== "wolf" && role !== "shapeshifter" && role !== "lookout" && role !== "magic");
+        optionsList = villageRoles.map((role, idx) => ({ id: `${role}-${idx}`, name: role }));
+    }
+
+    // Miramos si ya hay una decisión guardada en Firebase (elegida por el jugador)
+    const currentDecision = game.nightActions && game.nightActions[action.id];
 
     optionsList.forEach(opt => {
         const btn = document.createElement("button");
@@ -3721,16 +3733,26 @@ function renderSelector(container, optionsList, amount, instructionText) {
         btn.textContent = opt.name;
         btn.dataset.targetId = opt.id; 
 
+        // Si el jugador ya ha elegido esto en su móvil, se ilumina en verde
+        if (currentDecision === opt.id) {
+            btn.classList.add("selected");
+            btn.style.borderColor = "#9fd0a5"; 
+            title.innerHTML = `<strong style="color:#9fd0a5;">¡Decisión recibida!</strong><br>${action.role} ha elegido a ${opt.name}.<br>Pulsa <strong>Validar Acción</strong> para confirmar y continuar.`;
+        }
+
+        // Fallback: Si el narrador quiere forzarlo él a mano
         btn.addEventListener("click", () => {
-            if (amount === 1) {
-                document.querySelectorAll(".action-player-btn").forEach(b => b.classList.remove("selected"));
-                btn.classList.add("selected");
-            } else {
-                btn.classList.toggle("selected");
-            }
+            document.querySelectorAll(".action-player-btn").forEach(b => {
+                b.classList.remove("selected");
+                b.style.borderColor = "";
+            });
+            btn.classList.add("selected");
+            title.innerHTML = `Has marcado a ${opt.name} manualmente.<br>Pulsa <strong>Validar Acción</strong> para confirmar.`;
         });
+
         list.appendChild(btn);
     });
+
     container.appendChild(list);
 }
 
@@ -3931,39 +3953,14 @@ function getVillageRolePool() {
 // BOTÓN SIGUIENTE
 // ------------------------------------------
 
-function updateNextButton(
-    action
-) {
-
-    const button =
-        document.getElementById(
-            "next-action-btn"
-        );
-
-
-    const activeActions =
-        getActiveActions();
-
-
-    const isLast =
-        currentActionIndex ===
-        activeActions.length - 1;
-
-
-    if (isLast) {
-
-        button.textContent =
-            currentRound === 1
-                ? "Comenzar siguiente ronda"
-                : "Comenzar siguiente ronda";
-
+function updateNextButton(action) {
+    const button = document.getElementById("next-action-btn");
+    
+    if (action.type === "narrator") {
+        button.textContent = "Siguiente";
     } else {
-
-        button.textContent =
-            "Siguiente";
-
+        button.textContent = "Validar Acción";
     }
-
 }
 
 
