@@ -86,16 +86,6 @@ h2 {
 }
 
 
-h3 {
-
-    font-size: 1.2rem;
-
-    margin-bottom: 15px;
-
-    text-align: left;
-}
-
-
 .subtitle {
 
     color: #aaa6b8;
@@ -217,7 +207,8 @@ button:disabled {
     color: white;
 
     box-shadow:
-        0 6px 20px rgba(
+        0 6px 20px
+        rgba(
             123,
             92,
             255,
@@ -333,7 +324,8 @@ input[type="text"]:focus {
     border-color: #7b5cff;
 
     box-shadow:
-        0 0 0 2px rgba(
+        0 0 0 2px
+        rgba(
             123,
             92,
             255,
@@ -395,7 +387,8 @@ input[type="text"]:focus {
     color: #a997ff;
 
     text-shadow:
-        0 0 20px rgba(
+        0 0 20px
+        rgba(
             169,
             151,
             255,
@@ -414,6 +407,7 @@ input[type="text"]:focus {
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
     background: #29263a;
@@ -526,6 +520,7 @@ input[type="text"]:focus {
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
     color: #aaa6b8;
@@ -606,7 +601,7 @@ input[type="text"]:focus {
 
 
 /* ==========================================
-   BOTONES DE SALA
+   BOTONES SALA
 ========================================== */
 
 .start-btn {
@@ -647,39 +642,33 @@ input[type="text"]:focus {
 
 .config-section {
 
+    text-align: left;
+
+    margin-bottom: 28px;
+}
+
+
+.config-section-title {
+
+    color: #c8c2d8;
+
+    font-size: 1.15rem;
+
+    font-weight: bold;
+
+    margin-bottom: 12px;
+}
+
+
+.config-info-card {
+
     background: #171620;
 
     border: 1px solid #302d40;
 
-    border-radius: 10px;
+    border-radius: 9px;
 
-    padding: 18px;
-
-    margin-bottom: 15px;
-
-    text-align: left;
-}
-
-
-.config-info {
-
-    color: #aaa6b8;
-
-    font-size: 0.95rem;
-}
-
-
-.config-info strong {
-
-    color: #f2f0f5;
-}
-
-
-/* ==========================================
-   CONTADORES
-========================================== */
-
-.counter-row {
+    padding: 14px 15px;
 
     display: flex;
 
@@ -687,9 +676,41 @@ input[type="text"]:focus {
 
     justify-content: space-between;
 
-    margin-bottom: 18px;
+    color: #aaa6b8;
+}
 
-    color: #ddd;
+
+.config-info-card strong {
+
+    color: #c5b9ff;
+
+    font-size: 1.2rem;
+}
+
+
+.counter-row {
+
+    background: #171620;
+
+    border: 1px solid #302d40;
+
+    border-radius: 9px;
+
+    padding: 12px 14px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+}
+
+
+.counter-row > span {
+
+    color: #f2f0f5;
 }
 
 
@@ -699,37 +720,24 @@ input[type="text"]:focus {
 
     align-items: center;
 
-    gap: 12px;
+    gap: 10px;
 }
 
 
 .counter-btn {
 
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
 
     padding: 0;
 
-    border-radius: 8px;
-
     background: #29263a;
-
-    border: 1px solid #45405c;
 
     color: white;
 
-    font-size: 1.4rem;
+    border: 1px solid #45405c;
 
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-}
-
-
-.counter-btn:hover {
-
-    background: #39334e;
+    font-size: 1.3rem;
 }
 
 
@@ -739,27 +747,15 @@ input[type="text"]:focus {
 
     text-align: center;
 
-    font-size: 1.2rem;
+    color: #c5b9ff;
 
     font-weight: bold;
+
+    font-size: 1.1rem;
 }
 
 
-/* ==========================================
-   ROLES
-========================================== */
-
-.role-list {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 8px;
-}
-
-
-.role-option {
+.role-checkbox {
 
     display: flex;
 
@@ -767,17 +763,27 @@ input[type="text"]:focus {
 
     gap: 10px;
 
+    padding: 10px 12px;
+
     margin: 0;
 
-    padding: 8px 0;
+    border-radius: 7px;
 
-    color: #ddd;
+    background: transparent;
 
     cursor: pointer;
+
+    color: #d7d3df;
 }
 
 
-.role-option input {
+.role-checkbox:hover {
+
+    background: #171620;
+}
+
+
+.role-checkbox input {
 
     width: 18px;
     height: 18px;
@@ -788,19 +794,73 @@ input[type="text"]:focus {
 }
 
 
-.pool-info {
+.pool-count {
 
     color: #8f89a3;
 
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 
-    margin-top: 15px;
+    margin-top: 8px;
+
+    text-align: right;
 }
 
 
-.pool-info strong {
+.config-summary {
 
-    color: #bdb1e8;
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+
+    margin-bottom: 15px;
+}
+
+
+.config-summary > div {
+
+    background: #171620;
+
+    border: 1px solid #302d40;
+
+    border-radius: 9px;
+
+    padding: 12px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.config-summary span {
+
+    color: #8f89a3;
+
+    font-size: 0.75rem;
+}
+
+
+.config-summary strong {
+
+    color: #c5b9ff;
+
+    font-size: 1.2rem;
+}
+
+
+.reveal-checkbox {
+
+    background: #171620;
+
+    border: 1px solid #302d40;
+
+    margin-bottom: 15px;
+
+    border-radius: 9px;
 }
 
 
@@ -812,35 +872,37 @@ input[type="text"]:focus {
 
     text-align: left;
 
-    background: #241f2d;
+    background: #171620;
 
-    border: 1px solid #65517b;
+    border: 1px solid #6b5730;
 
-    border-radius: 10px;
+    border-radius: 9px;
 
-    padding: 16px;
+    padding: 15px;
 
     margin-bottom: 15px;
 
-    color: #d6ccea;
+    color: #c9b990;
+
+    font-size: 0.88rem;
+
+    line-height: 1.45;
 }
 
 
 .config-warnings.error {
 
-    border-color: #8d4b58;
+    border-color: #754545;
 
-    background: #291b20;
-
-    color: #efc5cb;
+    color: #d7a4a4;
 }
 
 
 .config-warnings h3 {
 
-    font-size: 1rem;
+    font-size: 0.95rem;
 
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 
@@ -852,46 +914,18 @@ input[type="text"]:focus {
 
 .config-warnings li {
 
-    margin-bottom: 7px;
+    margin-bottom: 5px;
+}
 
-    line-height: 1.4;
+
+#config-screen > .primary-btn {
+
+    margin-top: 5px;
 }
 
 
 /* ==========================================
-   RESUMEN
-========================================== */
-
-.config-summary {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    gap: 10px;
-
-    background: #111019;
-
-    border-radius: 8px;
-
-    padding: 13px;
-
-    margin-bottom: 15px;
-
-    color: #8f89a3;
-
-    font-size: 0.85rem;
-}
-
-
-.config-summary strong {
-
-    color: #ddd;
-}
-
-
-/* ==========================================
-   PARTIDA
+   PANTALLA DE ESPERA
 ========================================== */
 
 .game-started {
@@ -908,61 +942,60 @@ input[type="text"]:focus {
 }
 
 
-.game-phase {
+/* ==========================================
+   PARTIDA
+========================================== */
 
-    display: flex;
+.game-top {
 
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 12px;
+    text-align: center;
 
     margin-bottom: 25px;
 }
 
 
-.phase-label {
+.night-label {
 
-    color: #c5b9ff;
+    color: #aaa0c5;
 
-    font-size: 0.75rem;
+    font-size: 0.8rem;
 
-    letter-spacing: 3px;
+    letter-spacing: 4px;
+
+    font-weight: bold;
 }
 
 
-.round-label {
+.game-player-name {
 
-    color: #8f89a3;
+    margin-top: 8px;
 
-    font-size: 0.9rem;
+    color: #777181;
+
+    font-size: 0.85rem;
 }
 
-
-/* ==========================================
-   CARTA DE CARGO
-========================================== */
 
 .role-card {
 
     background:
         radial-gradient(
             circle at 50% 0%,
-            #30294a,
-            #171620 70%
+            #292341,
+            #171620
         );
 
-    border: 1px solid #514570;
+    border: 1px solid #514675;
 
     border-radius: 14px;
 
-    padding: 35px 20px;
+    padding: 38px 25px;
 
-    margin-bottom: 15px;
+    margin-bottom: 14px;
 
     box-shadow:
-        0 10px 35px rgba(
+        0 10px 35px
+        rgba(
             0,
             0,
             0,
@@ -975,43 +1008,37 @@ input[type="text"]:focus {
 
     color: #8f89a3;
 
-    font-size: 0.7rem;
+    font-size: 0.75rem;
 
-    letter-spacing: 3px;
+    letter-spacing: 4px;
 
-    margin-bottom: 15px;
+    margin-bottom: 18px;
 }
 
 
 .player-role-name {
 
-    color: #c5b9ff;
+    color: #c7baff;
+
+    font-size: 2.1rem;
+
+    font-weight: bold;
 
     margin-bottom: 15px;
 }
 
 
-.role-description {
+.player-role-description {
 
     color: #aaa6b8;
 
-    line-height: 1.5;
-
     font-size: 0.95rem;
+
+    line-height: 1.5;
 }
 
 
-/* ==========================================
-   ESTADO JUGADOR
-========================================== */
-
-.player-status-card {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
+.status-card {
 
     background: #171620;
 
@@ -1019,17 +1046,37 @@ input[type="text"]:focus {
 
     border-radius: 9px;
 
-    padding: 15px;
+    padding: 14px 16px;
 
-    margin-bottom: 15px;
+    display: flex;
 
-    color: #8f89a3;
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 14px;
+
+    text-align: left;
 }
 
 
-.player-status-card strong {
+.status-card span {
 
-    color: #b8e0bd;
+    color: #aaa6b8;
+
+    font-weight: bold;
+}
+
+
+.alive-status {
+
+    color: #9fd0a5;
+}
+
+
+.dead-status {
+
+    color: #d98e8e;
 }
 
 
@@ -1045,85 +1092,154 @@ input[type="text"]:focus {
 
     color: #aaa6b8;
 
+    font-size: 0.9rem;
+
     line-height: 1.5;
 }
 
 
 /* ==========================================
-   PANEL NARRADOR
+   NARRADOR
 ========================================== */
 
-.host-game-players {
+.narrator-header {
 
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 8px;
-
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 
-.host-player {
+.narrator-header p {
 
-    background: #171620;
+    margin-top: 8px;
 
-    border: 1px solid #302d40;
-
-    border-radius: 9px;
-
-    padding: 14px;
-
-    text-align: left;
-}
-
-
-.host-player-top {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    margin-bottom: 6px;
-}
-
-
-.host-player-name {
-
-    font-size: 1rem;
-
-    color: #eee;
-}
-
-
-.host-player-role {
-
-    color: #c5b9ff;
+    color: #8f89a3;
 
     font-size: 0.9rem;
 }
 
 
-.host-player-status {
+.narrator-header strong {
 
-    color: #8f89a3;
-
-    font-size: 0.8rem;
+    color: #c5b9ff;
 }
 
 
-.host-controls {
+.narrator-card {
 
-    margin-top: 15px;
+    background: #171620;
+
+    border: 1px solid #302d40;
+
+    border-radius: 10px;
+
+    padding: 15px;
+
+    margin-bottom: 14px;
+
+    text-align: left;
 }
 
 
-.host-controls button {
+.narrator-card-title {
 
-    width: 100%;
+    color: #c8c2d8;
+
+    font-size: 0.95rem;
+
+    font-weight: bold;
+
+    margin-bottom: 12px;
+}
+
+
+.narrator-player {
+
+    border-top: 1px solid #302d40;
+
+    padding: 12px 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+}
+
+
+.narrator-player:first-child {
+
+    border-top: none;
+
+    padding-top: 0;
+}
+
+
+.narrator-player:last-child {
+
+    padding-bottom: 0;
+}
+
+
+.narrator-player-name {
+
+    color: #f2f0f5;
+
+    font-size: 0.95rem;
+}
+
+
+.narrator-player-role {
+
+    color: #b9adf1;
+
+    font-size: 0.85rem;
+
+    text-align: right;
+}
+
+
+.narrator-player-dead {
+
+    opacity: 0.45;
+}
+
+
+.narrator-player-dead
+.narrator-player-name {
+
+    text-decoration: line-through;
+}
+
+
+.unused-roles-list {
+
+    color: #aaa6b8;
+
+    font-size: 0.9rem;
+
+    line-height: 1.7;
+}
+
+
+.role-tag {
+
+    display: inline-block;
+
+    background: #29263a;
+
+    border: 1px solid #45405c;
+
+    border-radius: 6px;
+
+    padding: 4px 7px;
+
+    margin: 2px;
+
+    color: #c8c2d8;
+
+    font-size: 0.78rem;
 }
 
 
@@ -1159,11 +1275,15 @@ input[type="text"]:focus {
     }
 
 
+    .player-role-name {
+
+        font-size: 1.8rem;
+    }
+
+
     .config-summary {
 
-        flex-direction: column;
-
-        gap: 5px;
+        grid-template-columns: 1fr 1fr;
     }
 
 }
