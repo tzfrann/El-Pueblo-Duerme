@@ -3102,5 +3102,1086 @@ async function cleanupExpiredGames() {
 
 }
 
+// ==========================================
+// MOTOR DE RONDAS
+// ==========================================
 
+
+// ------------------------------------------
+// DEFINICIÓN DE ACCIONES
+// ------------------------------------------
+
+const ROUND_1_ACTIONS = [
+
+    {
+        id: "sleep",
+        role: "Pueblo",
+        title: "El pueblo duerme",
+        icon: "🌙",
+        description:
+            "Todos los jugadores deben cerrar los ojos.",
+        type: "narrator"
+    },
+
+    {
+        id: "shapeshifter",
+        role: "Lobo cambiaformas",
+        title: "Lobo cambiaformas",
+        icon: "🐺",
+        description:
+            "El Lobo cambiaformas puede elegir un cargo del pool de sobras del pueblo.",
+        type: "role",
+        requiresRole: "shapeshifter",
+        targetPool: "village"
+    },
+
+    {
+        id: "joker",
+        role: "Joker",
+        title: "Joker",
+        icon: "🃏",
+        description:
+            "El Joker puede elegir un cargo del pool de sobras del pueblo.",
+        type: "role",
+        requiresRole: "joker",
+        targetPool: "village"
+    },
+
+    {
+        id: "cupid",
+        role: "Cupido",
+        title: "Cupido",
+        icon: "💘",
+        description:
+            "Cupido debe elegir a los dos jugadores que estarán enamorados.",
+        type: "role",
+        requiresRole: "cupid",
+        targetPlayers: 2
+    },
+
+    {
+        id: "lovers",
+        role: "Enamorados",
+        title: "Los enamorados se despiertan",
+        icon: "❤️",
+        description:
+            "Los dos enamorados se despiertan y se ven entre ellos.",
+        type: "special"
+    },
+
+    {
+        id: "magic-wolf",
+        role: "Lobo mágico",
+        title: "Lobo mágico",
+        icon: "🔮",
+        description:
+            "El Lobo mágico decide si quiere utilizar su poder.",
+        type: "role",
+        requiresRole: "magic"
+    },
+
+    {
+        id: "seer",
+        role: "Vidente",
+        title: "Vidente",
+        icon: "👁️",
+        description:
+            "La Vidente decide si quiere utilizar su poder y puede elegir a cualquier jugador.",
+        type: "role",
+        requiresRole: "seer",
+        targetPlayers: 1
+    },
+
+    {
+        id: "detective",
+        role: "Detective",
+        title: "Detective",
+        icon: "🕵️",
+        description:
+            "El Detective elige a un jugador.",
+        type: "role",
+        requiresRole: "detective",
+        targetPlayers: 1
+    },
+
+    {
+        id: "protector",
+        role: "Protector",
+        title: "Protector",
+        icon: "🛡️",
+        description:
+            "El Protector decide si quiere utilizar su poder.",
+        type: "role",
+        requiresRole: "protector",
+        targetPlayers: 1
+    },
+
+    {
+        id: "wolves",
+        role: "Lobos",
+        title: "Los lobos despiertan",
+        icon: "🐺",
+        description:
+            "Los lobos deciden conjuntamente a quién eliminar.",
+        type: "wolves",
+        targetPlayers: 1
+    },
+
+    {
+        id: "witch",
+        role: "Bruja",
+        title: "Bruja",
+        icon: "🧙",
+        description:
+            "La Bruja decide si quiere utilizar alguno de sus poderes.",
+        type: "role",
+        requiresRole: "witch"
+    },
+
+    {
+        id: "wake",
+        role: "Pueblo",
+        title: "El pueblo despierta",
+        icon: "☀️",
+        description:
+            "Todos los jugadores abren los ojos.",
+        type: "narrator"
+    },
+
+    {
+        id: "wolf-death",
+        role: "Narrador",
+        title: "Resolución de los lobos",
+        icon: "⚔️",
+        description:
+            "El narrador anuncia quién ha sido eliminado durante la noche.",
+        type: "narrator"
+    },
+
+    {
+        id: "vote",
+        role: "Pueblo",
+        title: "Votación del pueblo",
+        icon: "🗳️",
+        description:
+            "El pueblo debe votar para decidir a quién eliminar.",
+        type: "vote"
+    },
+
+    {
+        id: "vote-result",
+        role: "Narrador",
+        title: "Resolución de la votación",
+        icon: "☠️",
+        description:
+            "El narrador elimina al jugador que haya recibido la votación.",
+        type: "narrator"
+    }
+
+];
+
+
+const NEXT_ROUND_ACTIONS = [
+
+    {
+        id: "sleep",
+        role: "Pueblo",
+        title: "El pueblo duerme",
+        icon: "🌙",
+        description:
+            "Todos los jugadores deben cerrar los ojos.",
+        type: "narrator"
+    },
+
+    {
+        id: "medium",
+        role: "Médium",
+        title: "Médium",
+        icon: "👻",
+        description:
+            "La Médium puede mirar las cartas correspondientes.",
+        type: "role",
+        requiresRole: "medium"
+    },
+
+    {
+        id: "apprentice",
+        role: "Aprendiz",
+        title: "Aprendiz",
+        icon: "🎓",
+        description:
+            "El Aprendiz realiza su acción.",
+        type: "role",
+        requiresRole: "apprentice"
+    },
+
+    {
+        id: "magic-wolf",
+        role: "Lobo mágico",
+        title: "Lobo mágico",
+        icon: "🔮",
+        description:
+            "El Lobo mágico decide si quiere utilizar su poder, si todavía dispone de él.",
+        type: "role",
+        requiresRole: "magic"
+    },
+
+    {
+        id: "mage",
+        role: "Mago",
+        title: "Mago",
+        icon: "🧙",
+        description:
+            "El Mago decide si quiere utilizar su poder, si todavía dispone de él.",
+        type: "role",
+        requiresRole: "mage"
+    },
+
+    {
+        id: "seer",
+        role: "Vidente",
+        title: "Vidente",
+        icon: "👁️",
+        description:
+            "La Vidente decide si quiere utilizar su poder y puede elegir a cualquier jugador.",
+        type: "role",
+        requiresRole: "seer",
+        targetPlayers: 1
+    },
+
+    {
+        id: "detective",
+        role: "Detective",
+        title: "Detective",
+        icon: "🕵️",
+        description:
+            "El Detective elige a un jugador.",
+        type: "role",
+        requiresRole: "detective",
+        targetPlayers: 1
+    },
+
+    {
+        id: "protector",
+        role: "Protector",
+        title: "Protector",
+        icon: "🛡️",
+        description:
+            "El Protector decide si quiere utilizar su poder.",
+        type: "role",
+        requiresRole: "protector",
+        targetPlayers: 1
+    },
+
+    {
+        id: "wolves",
+        role: "Lobos",
+        title: "Los lobos despiertan",
+        icon: "🐺",
+        description:
+            "Los lobos deciden conjuntamente a quién eliminar.",
+        type: "wolves",
+        targetPlayers: 1
+    },
+
+    {
+        id: "witch",
+        role: "Bruja",
+        title: "Bruja",
+        icon: "🧙",
+        description:
+            "La Bruja decide si quiere utilizar alguno de sus poderes, si todavía dispone de ellos.",
+        type: "role",
+        requiresRole: "witch"
+    },
+
+    {
+        id: "wake",
+        role: "Pueblo",
+        title: "El pueblo despierta",
+        icon: "☀️",
+        description:
+            "Todos los jugadores abren los ojos.",
+        type: "narrator"
+    },
+
+    {
+        id: "wolf-death",
+        role: "Narrador",
+        title: "Resolución de los lobos",
+        icon: "⚔️",
+        description:
+            "El narrador anuncia quién ha sido eliminado durante la noche.",
+        type: "narrator"
+    },
+
+    {
+        id: "vote",
+        role: "Pueblo",
+        title: "Votación del pueblo",
+        icon: "🗳️",
+        description:
+            "El pueblo debe votar para decidir a quién eliminar.",
+        type: "vote"
+    },
+
+    {
+        id: "vote-result",
+        role: "Narrador",
+        title: "Resolución de la votación",
+        icon: "☠️",
+        description:
+            "El narrador elimina al jugador que haya recibido la votación.",
+        type: "narrator"
+    }
+
+];
+
+
+// ------------------------------------------
+// ESTADO DEL MOTOR
+// ------------------------------------------
+
+let currentRound = 1;
+
+let currentActionIndex = 0;
+
+let currentRoundActions = [];
+
+
+// ------------------------------------------
+// INICIAR PARTIDA
+// ------------------------------------------
+
+function initializeGame() {
+
+    currentRound = 1;
+
+    currentActionIndex = 0;
+
+    currentRoundActions =
+        [...ROUND_1_ACTIONS];
+
+    renderCurrentAction();
+
+}
+
+
+// ------------------------------------------
+// COMENZAR NUEVA RONDA
+// ------------------------------------------
+
+function startNextRound() {
+
+    currentRound++;
+
+    currentActionIndex = 0;
+
+    currentRoundActions =
+        [...NEXT_ROUND_ACTIONS];
+
+    renderCurrentAction();
+
+}
+
+
+// ------------------------------------------
+// OBTENER ACCIONES ACTIVAS
+// ------------------------------------------
+
+function getActiveActions() {
+
+    return currentRoundActions.filter(
+        action => {
+
+            // Las acciones sin requisito
+            // siempre aparecen.
+
+            if (!action.requiresRole) {
+                return true;
+            }
+
+
+            // ----------------------------------
+            // CAMBIAPFORMAS
+            // ----------------------------------
+
+            if (
+                action.requiresRole ===
+                "shapeshifter"
+            ) {
+
+                return gameConfig
+                    .wolfRoles
+                    .shapeshifter;
+
+            }
+
+
+            // ----------------------------------
+            // LOBO MÁGICO
+            // ----------------------------------
+
+            if (
+                action.requiresRole ===
+                "magic"
+            ) {
+
+                return gameConfig
+                    .wolfRoles
+                    .magic;
+
+            }
+
+
+            // ----------------------------------
+            // RESTO DE ROLES
+            // ----------------------------------
+
+            return gameConfig
+                .villageRoles[
+                    action.requiresRole
+                ] === true;
+
+        }
+    );
+
+}
+
+
+// ------------------------------------------
+// MOSTRAR ACCIÓN ACTUAL
+// ------------------------------------------
+
+function renderCurrentAction() {
+
+    const activeActions =
+        getActiveActions();
+
+
+    if (
+        currentActionIndex >=
+        activeActions.length
+    ) {
+
+        if (currentRound === 1) {
+
+            startNextRound();
+
+        } else {
+
+            startNextRound();
+
+        }
+
+        return;
+    }
+
+
+    const action =
+        activeActions[
+            currentActionIndex
+        ];
+
+
+    document
+        .getElementById(
+            "current-round"
+        )
+        .textContent =
+            currentRound;
+
+
+    document
+        .getElementById(
+            "action-title"
+        )
+        .textContent =
+            action.title;
+
+
+    document
+        .getElementById(
+            "action-description"
+        )
+        .textContent =
+            action.description;
+
+
+    document
+        .getElementById(
+            "action-icon"
+        )
+        .textContent =
+            action.icon;
+
+
+    document
+        .getElementById(
+            "action-role"
+        )
+        .textContent =
+            action.role;
+
+
+    document
+        .getElementById(
+            "action-instruction"
+        )
+        .textContent =
+            action.description;
+
+
+    document
+        .getElementById(
+            "action-number"
+        )
+        .textContent =
+            `Acción ${currentActionIndex + 1}`;
+
+
+    document
+        .getElementById(
+            "action-total"
+        )
+        .textContent =
+            `de ${activeActions.length}`;
+
+
+    const percentage =
+        (
+            (currentActionIndex + 1) /
+            activeActions.length
+        ) * 100;
+
+
+    document
+        .getElementById(
+            "action-progress-fill"
+        )
+        .style.width =
+            `${percentage}%`;
+
+
+    const content =
+        document.getElementById(
+            "action-content"
+        );
+
+
+    content.innerHTML = "";
+
+
+    renderActionContent(
+        action,
+        content
+    );
+
+
+    updateNextButton(
+        action
+    );
+
+}
+
+
+// ------------------------------------------
+// CONTENIDO DE CADA ACCIÓN
+// ------------------------------------------
+
+function renderActionContent(
+    action,
+    container
+) {
+
+    // --------------------------------------
+    // ACCIÓN DEL NARRADOR
+    // --------------------------------------
+
+    if (
+        action.type ===
+        "narrator"
+    ) {
+
+        return;
+
+    }
+
+
+    // --------------------------------------
+    // ACCIONES CON JUGADORES
+    // --------------------------------------
+
+    if (
+        action.targetPlayers
+    ) {
+
+        renderPlayerSelector(
+            container,
+            action.targetPlayers
+        );
+
+        return;
+
+    }
+
+
+    // --------------------------------------
+    // CAMBIAPFORMAS / JOKER
+    // --------------------------------------
+
+    if (
+        action.targetPool ===
+        "village"
+    ) {
+
+        renderVillageRolePool(
+            container
+        );
+
+        return;
+
+    }
+
+
+    // --------------------------------------
+    // RESTO DE ACCIONES
+    // --------------------------------------
+
+    const message =
+        document.createElement(
+            "p"
+        );
+
+    message.className =
+        "action-instruction";
+
+    message.textContent =
+        "El narrador debe resolver esta acción.";
+
+    container.appendChild(
+        message
+    );
+
+}
+
+
+// ------------------------------------------
+// SELECTOR DE JUGADORES
+// ------------------------------------------
+
+function renderPlayerSelector(
+    container,
+    amount
+) {
+
+    const players =
+        getCurrentPlayers();
+
+
+    const title =
+        document.createElement(
+            "p"
+        );
+
+    title.className =
+        "action-instruction";
+
+    title.textContent =
+        amount === 1
+            ? "Selecciona un jugador."
+            : `Selecciona ${amount} jugadores.`;
+
+    container.appendChild(
+        title
+    );
+
+
+    const list =
+        document.createElement(
+            "div"
+        );
+
+    list.className =
+        "action-player-list";
+
+
+    players.forEach(
+        player => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "action-player-btn";
+
+            button.textContent =
+                player.name;
+
+
+            button.dataset.playerId =
+                player.id;
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    button.classList.toggle(
+                        "selected"
+                    );
+
+                }
+            );
+
+
+            list.appendChild(
+                button
+            );
+
+        }
+    );
+
+
+    container.appendChild(
+        list
+    );
+
+}
+
+
+// ------------------------------------------
+// POOL DE SOBRAS DEL PUEBLO
+// ------------------------------------------
+
+function renderVillageRolePool(
+    container
+) {
+
+    const title =
+        document.createElement(
+            "p"
+        );
+
+    title.className =
+        "action-instruction";
+
+    title.textContent =
+        "Selecciona un cargo del pool de sobras del pueblo.";
+
+    container.appendChild(
+        title
+    );
+
+
+    const pool =
+        getVillageRolePool();
+
+
+    const list =
+        document.createElement(
+            "div"
+        );
+
+    list.className =
+        "action-player-list";
+
+
+    pool.forEach(
+        role => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "action-player-btn";
+
+            button.textContent =
+                role;
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    document
+                        .querySelectorAll(
+                            ".action-player-btn"
+                        )
+                        .forEach(
+                            other => {
+
+                                other.classList.remove(
+                                    "selected"
+                                );
+
+                            }
+                        );
+
+
+                    button.classList.add(
+                        "selected"
+                    );
+
+                }
+            );
+
+
+            list.appendChild(
+                button
+            );
+
+        }
+    );
+
+
+    container.appendChild(
+        list
+    );
+
+}
+
+
+// ------------------------------------------
+// OBTENER JUGADORES
+// ------------------------------------------
+
+function getCurrentPlayers() {
+
+    const playersList =
+        document.getElementById(
+            "players-list"
+        );
+
+
+    if (!playersList) {
+        return [];
+    }
+
+
+    const elements =
+        playersList.querySelectorAll(
+            ".player"
+        );
+
+
+    return Array.from(
+        elements
+    ).map(
+        element => {
+
+            const nameElement =
+                element.querySelector(
+                    ".player-name"
+                );
+
+
+            return {
+
+                id:
+                    element.dataset.playerId ||
+                    nameElement?.textContent ||
+                    "",
+
+                name:
+                    nameElement
+                        ? nameElement.textContent
+                            .replace(
+                                " 👑 Narrador",
+                                ""
+                            )
+                            .trim()
+                        : ""
+
+            };
+
+        }
+    );
+
+}
+
+
+// ------------------------------------------
+// POOL DE CARGOS DEL PUEBLO
+// ------------------------------------------
+
+function getVillageRolePool() {
+
+    const pool = [];
+
+
+    // Pueblerino normal
+
+    for (
+        let i = 0;
+        i < gameConfig.villagers;
+        i++
+    ) {
+
+        pool.push(
+            "Pueblerino"
+        );
+
+    }
+
+
+    // Cargos especiales del pueblo
+
+    const villageRoleNames = {
+
+        girl:
+            "Niña",
+
+        seer:
+            "Vidente",
+
+        cupid:
+            "Cupido",
+
+        witch:
+            "Bruja",
+
+        hunter:
+            "Cazador",
+
+        apprentice:
+            "Aprendiz",
+
+        mage:
+            "Mago",
+
+        joker:
+            "Joker",
+
+        medium:
+            "Médium",
+
+        protector:
+            "Protector",
+
+        detective:
+            "Detective"
+
+    };
+
+
+    Object.entries(
+        gameConfig.villageRoles
+    ).forEach(
+        ([role, enabled]) => {
+
+            if (
+                enabled &&
+                villageRoleNames[role]
+            ) {
+
+                pool.push(
+                    villageRoleNames[role]
+                );
+
+            }
+
+        }
+    );
+
+
+    return pool;
+
+}
+
+
+// ------------------------------------------
+// BOTÓN SIGUIENTE
+// ------------------------------------------
+
+function updateNextButton(
+    action
+) {
+
+    const button =
+        document.getElementById(
+            "next-action-btn"
+        );
+
+
+    const activeActions =
+        getActiveActions();
+
+
+    const isLast =
+        currentActionIndex ===
+        activeActions.length - 1;
+
+
+    if (isLast) {
+
+        button.textContent =
+            currentRound === 1
+                ? "Comenzar siguiente ronda"
+                : "Comenzar siguiente ronda";
+
+    } else {
+
+        button.textContent =
+            "Siguiente";
+
+    }
+
+}
+
+
+// ------------------------------------------
+// SIGUIENTE ACCIÓN
+// ------------------------------------------
+
+document
+    .getElementById(
+        "next-action-btn"
+    )
+    .addEventListener(
+        "click",
+        nextAction
+    );
+
+
+function nextAction() {
+
+    currentActionIndex++;
+
+    renderCurrentAction();
+
+}
+
+
+// ------------------------------------------
+// MODIFICAR LISTA DE JUGADORES
+// ------------------------------------------
+//
+// Guardamos el ID real del jugador en cada
+// elemento visual de la sala.
+// ------------------------------------------
+
+function addPlayerIdsToLobby() {
+
+    const players =
+        getCurrentPlayers();
+
+    // Esta función queda preparada para
+    // conectar posteriormente los IDs reales.
+}
+
+
+// ------------------------------------------
+// INICIAR EL MOTOR CUANDO LA PARTIDA
+// PASA A "STARTED"
+// ------------------------------------------
+//
+// IMPORTANTE:
+// Sustituimos la parte correspondiente de
+// listenToGame para llamar a initializeGame().
+// ------------------------------------------
 cleanupExpiredGames();
