@@ -6,266 +6,438 @@
 
     <title>El Pueblo Duerme</title>
 
-    <link rel="stylesheet" href="style.css">
-</head>
+<link rel="stylesheet" href="style.css">
 
-<body>
+<main class="container">
 
-    <main class="container">
+    <!-- =========================
+         PANTALLA PRINCIPAL
+    ========================== -->
 
-        <!-- =========================
-             PANTALLA PRINCIPAL
-        ========================== -->
+    <section id="home-screen" class="screen">
 
-        <section id="home-screen" class="screen">
+        <div class="logo-area">
+            <div class="moon">☾</div>
 
-            <div class="logo-area">
-                <div class="moon">☾</div>
+            <h1>El Pueblo Duerme</h1>
 
-                <h1>El Pueblo Duerme</h1>
-
-                <p class="subtitle">
-                    Un pueblo. Una noche. Nadie está a salvo.
-                </p>
-            </div>
-
-            <div class="menu">
-
-                <button
-                    id="create-game-btn"
-                    class="primary-btn"
-                >
-                    Crear partida
-                </button>
-
-                <button
-                    id="join-game-btn"
-                    class="secondary-btn"
-                >
-                    Unirse a una partida
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <!-- =========================
-             CREAR PARTIDA
-        ========================== -->
-
-        <section id="create-screen" class="screen hidden">
-
-            <button
-                class="back-btn"
-                id="create-back-btn"
-            >
-                ← Volver
-            </button>
-
-            <h2>Crear partida</h2>
-
-            <p class="screen-description">
-                Tú serás el narrador de esta partida.
+            <p class="subtitle">
+                Un pueblo. Una noche. Nadie está a salvo.
             </p>
+        </div>
 
-            <label for="host-name">
-                Tu nombre
-            </label>
+        <div class="menu">
 
-            <input
-                type="text"
-                id="host-name"
-                placeholder="Introduce tu nombre"
-                maxlength="20"
-                autocomplete="off"
-            >
-
-            <button
-                id="create-confirm-btn"
-                class="primary-btn"
-            >
+            <button id="create-game-btn" class="primary-btn">
                 Crear partida
             </button>
 
-        </section>
-
-
-        <!-- =========================
-             UNIRSE A PARTIDA
-        ========================== -->
-
-        <section id="join-screen" class="screen hidden">
-
-            <button
-                class="back-btn"
-                id="join-back-btn"
-            >
-                ← Volver
+            <button id="join-game-btn" class="secondary-btn">
+                Unirse a una partida
             </button>
 
-            <h2>Unirse a una partida</h2>
+        </div>
 
-            <p class="screen-description">
-                Introduce el código que te ha dado el narrador.
+    </section>
+
+
+    <!-- =========================
+         CREAR PARTIDA
+    ========================== -->
+
+    <section id="create-screen" class="screen hidden">
+
+        <button class="back-btn" id="create-back-btn">
+            ← Volver
+        </button>
+
+        <h2>Crear partida</h2>
+
+        <p class="screen-description">
+            Tú serás el narrador de esta partida.
+        </p>
+
+        <label for="host-name">
+            Tu nombre
+        </label>
+
+        <input
+            type="text"
+            id="host-name"
+            placeholder="Introduce tu nombre"
+            maxlength="20"
+            autocomplete="off"
+        >
+
+        <button id="create-confirm-btn" class="primary-btn">
+            Crear partida
+        </button>
+
+    </section>
+
+
+    <!-- =========================
+         UNIRSE A PARTIDA
+    ========================== -->
+
+    <section id="join-screen" class="screen hidden">
+
+        <button class="back-btn" id="join-back-btn">
+            ← Volver
+        </button>
+
+        <h2>Unirse a una partida</h2>
+
+        <p class="screen-description">
+            Introduce el código que te ha dado el narrador.
+        </p>
+
+        <label for="game-code">
+            Código de partida
+        </label>
+
+        <input
+            type="text"
+            id="game-code"
+            placeholder="Ej. UV45J"
+            maxlength="5"
+            autocomplete="off"
+            autocapitalize="characters"
+        >
+
+        <label for="player-name">
+            Tu nombre
+        </label>
+
+        <input
+            type="text"
+            id="player-name"
+            placeholder="Introduce tu nombre"
+            maxlength="20"
+            autocomplete="off"
+        >
+
+        <button id="join-confirm-btn" class="primary-btn">
+            Unirse
+        </button>
+
+    </section>
+
+
+    <!-- =========================
+         SALA DE ESPERA
+    ========================== -->
+
+    <section id="lobby-screen" class="screen hidden">
+
+        <div class="game-header">
+
+            <p class="lobby-label">
+                CÓDIGO DE PARTIDA
             </p>
 
-            <label for="game-code">
-                Código de partida
-            </label>
+            <div class="code-container">
 
-            <input
-                type="text"
-                id="game-code"
-                placeholder="Ej. UV45J"
-                maxlength="5"
-                autocomplete="off"
-                autocapitalize="characters"
-            >
-
-            <label for="player-name">
-                Tu nombre
-            </label>
-
-            <input
-                type="text"
-                id="player-name"
-                placeholder="Introduce tu nombre"
-                maxlength="20"
-                autocomplete="off"
-            >
-
-            <button
-                id="join-confirm-btn"
-                class="primary-btn"
-            >
-                Unirse
-            </button>
-
-        </section>
-
-
-        <!-- =========================
-             SALA DE ESPERA
-        ========================== -->
-
-        <section id="lobby-screen" class="screen hidden">
-
-            <div class="game-header">
-
-                <p class="lobby-label">
-                    CÓDIGO DE PARTIDA
-                </p>
-
-                <div class="code-container">
-
-                    <div
-                        id="game-code-display"
-                        class="game-code"
-                    >
-                        -----
-                    </div>
-
-                    <button
-                        id="copy-code-btn"
-                        class="copy-btn"
-                        title="Copiar código"
-                    >
-                        ⧉
-                    </button>
-
+                <div id="game-code-display" class="game-code">
+                    -----
                 </div>
+
+                <button
+                    id="copy-code-btn"
+                    class="copy-btn"
+                    title="Copiar código"
+                >
+                    ⧉
+                </button>
 
             </div>
 
+        </div>
 
-            <div class="lobby-title-row">
+
+        <div class="lobby-title-row">
+
+            <div>
+
+                <h2>Sala de espera</h2>
+
+                <p id="player-count">
+                    0 jugadores
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div id="players-list" class="players-list">
+            <!-- Jugadores generados por JavaScript -->
+        </div>
+
+
+        <div id="host-message" class="host-message hidden">
+            Eres el narrador. Cuando todos estén preparados,
+            puedes comenzar la partida.
+        </div>
+
+
+        <div id="waiting-message" class="waiting-message hidden">
+            Esperando a que el narrador comience la partida...
+        </div>
+
+
+        <button
+            id="start-game-btn"
+            class="primary-btn start-btn hidden"
+        >
+            Configurar partida
+        </button>
+
+
+        <button id="leave-game-btn" class="leave-btn">
+            Salir de la partida
+        </button>
+
+    </section>
+
+
+    <!-- =========================
+         CONFIGURACIÓN
+    ========================== -->
+
+    <section id="setup-screen" class="screen hidden">
+
+        <button class="back-btn" id="setup-back-btn">
+            ← Volver
+        </button>
+
+        <h2>Configurar partida</h2>
+
+        <p class="screen-description">
+            Elige cómo quieres jugar esta partida.
+        </p>
+
+
+        <!-- JUGADORES -->
+
+        <div class="setup-section">
+
+            <h3>Composición</h3>
+
+            <div class="number-setting">
 
                 <div>
-                    <h2>Sala de espera</h2>
+                    <strong>Jugadores</strong>
 
-                    <p id="player-count">
-                        0 jugadores
-                    </p>
+                    <span>
+                        Número de personas en la partida
+                    </span>
                 </div>
 
+                <input
+                    type="number"
+                    id="setup-player-count"
+                    min="1"
+                    value="1"
+                >
+
             </div>
 
 
-            <div
-                id="players-list"
-                class="players-list"
-            >
-                <!-- Jugadores generados por JavaScript -->
-            </div>
+            <div class="number-setting">
 
+                <div>
+                    <strong>Lobos</strong>
 
-            <div
-                id="host-message"
-                class="host-message hidden"
-            >
-                Eres el narrador. Cuando todos estén preparados,
-                puedes comenzar la partida.
-            </div>
-
-
-            <div
-                id="waiting-message"
-                class="waiting-message hidden"
-            >
-                Esperando a que el narrador comience la partida...
-            </div>
-
-
-            <button
-                id="start-game-btn"
-                class="primary-btn start-btn hidden"
-            >
-                Empezar partida
-            </button>
-
-
-            <button
-                id="leave-game-btn"
-                class="leave-btn"
-            >
-                Salir de la partida
-            </button>
-
-        </section>
-
-
-        <!-- =========================
-             PANTALLA DE PARTIDA
-        ========================== -->
-
-        <section id="game-screen" class="screen hidden">
-
-            <div class="game-started">
-
-                <div class="moon large-moon">
-                    ☾
+                    <span>
+                        Número de lobos de la partida
+                    </span>
                 </div>
 
-                <h2>
-                    La partida comienza
-                </h2>
-
-                <p>
-                    El narrador está preparando la partida...
-                </p>
+                <input
+                    type="number"
+                    id="setup-wolf-count"
+                    min="1"
+                    value="1"
+                >
 
             </div>
 
-        </section>
 
-    </main>
+            <div class="number-setting">
+
+                <div>
+                    <strong>Pueblerinos</strong>
+
+                    <span>
+                        Cartas de pueblerino raso
+                    </span>
+                </div>
+
+                <input
+                    type="number"
+                    id="setup-villager-count"
+                    min="0"
+                    value="0"
+                >
+
+            </div>
+
+        </div>
 
 
-    <script
-        type="module"
-        src="app.js"
-    ></script>
+        <!-- ROLES DEL PUEBLO -->
+
+        <div class="setup-section">
+
+            <h3>Cargos del pueblo</h3>
+
+            <p class="setup-help">
+                Los cargos seleccionados entrarán en el pool
+                y se sortearán entre los jugadores.
+            </p>
+
+
+            <div class="role-options">
+
+                <label class="role-option">
+                    <input type="checkbox" value="little_girl">
+                    <span>Niña</span>
+                </label>
+
+                <label class="role-option">
+                    <input type="checkbox" value="seer">
+                    <span>Vidente</span>
+                </label>
+
+                <label class="role-option">
+                    <input type="checkbox" value="cupid">
+                    <span>Cupido</span>
+                </label>
+
+                <label class="role-option">
+                    <input type="checkbox" value="witch">
+                    <span>Bruja</span>
+                </label>
+
+                <label class="role-option">
+                    <input type="checkbox" value="hunter">
+                    <span>Cazador</span>
+                </label>
+
+                <label class="role-option">
+                    <input type="checkbox" value="apprentice">
+                    <span>Aprendiz</span>
+                </label>
+
+                <label class="role-option">
+                    <input type="checkbox" value="mage">
+                    <span>Mago</span>
+                </label>
+
+                <label class="role-option">
+                    <input type="checkbox" value="joker">
+                    <span>Joker</span>
+                </label>
+
+                <label class="role-option">
+                    <input type="checkbox" value="medium">
+                    <span>Médium</span>
+                </label>
+
+                <label class="role-option">
+                    <input type="checkbox" value="squire">
+                    <span>Escudero</span>
+                </label>
+
+                <label class="role-option">
+                    <input type="checkbox" value="detective">
+                    <span>Detective</span>
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- OPCIONES -->
+
+        <div class="setup-section">
+
+            <h3>Reglas</h3>
+
+            <label class="switch-option">
+
+                <input
+                    type="checkbox"
+                    id="setup-secret-voting"
+                    checked
+                >
+
+                <span>
+                    Votación secreta
+                </span>
+
+            </label>
+
+
+            <label class="switch-option">
+
+                <input
+                    type="checkbox"
+                    id="setup-reveal-roles"
+                >
+
+                <span>
+                    Revelar cargo al morir
+                </span>
+
+            </label>
+
+        </div>
+
+
+        <div id="setup-error" class="setup-error hidden"></div>
+
+
+        <button
+            id="generate-game-btn"
+            class="primary-btn"
+        >
+            Generar partida
+        </button>
+
+    </section>
+
+
+    <!-- =========================
+         PARTIDA
+    ========================== -->
+
+    <section id="game-screen" class="screen hidden">
+
+        <div class="game-started">
+
+            <div class="moon large-moon">
+                ☾
+            </div>
+
+            <h2>
+                La partida comienza
+            </h2>
+
+            <p>
+                El narrador está preparando la partida...
+            </p>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script type="module" src="app.js"></script>
 
 </body>
 </html>
