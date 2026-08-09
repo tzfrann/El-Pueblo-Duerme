@@ -2622,6 +2622,40 @@ function renderPlayerNightAction(game, action, container) {
         return; // Termina la UI de la bruja
     }
     // --- FIN INTERFAZ BRUJA ---
+    // --- INTERFAZ EXCLUSIVA PARA LA MÉDIUM ---
+    if (action.id === "medium") {
+        const title = document.createElement("p");
+        title.style.marginBottom = "15px";
+        title.innerHTML = `<strong>¡Despierta, Médium!</strong><br>Aquí tienes el registro de los espíritus.`;
+        container.appendChild(title);
+
+        const deadPlayers = Object.values(game.players).filter(p => !p.alive && !p.host);
+        const listDiv = document.createElement("div");
+        listDiv.style.marginBottom = "20px"; listDiv.style.padding = "15px";
+        listDiv.style.background = "#29263a"; listDiv.style.borderRadius = "8px";
+
+        if (deadPlayers.length === 0) {
+            listDiv.innerHTML = `<span style="color:#aaa6b8;">Nadie ha muerto todavía.</span>`;
+        } else {
+            deadPlayers.forEach(dp => {
+                const rName = ROLE_INFO[dp.originalRole || dp.role]?.name || (dp.originalRole || dp.role);
+                listDiv.innerHTML += `<p style="margin-bottom:8px;">💀 <strong>${dp.name}</strong> era: <span style="color:#c7baff;">${rName}</span></p>`;
+            });
+        }
+        container.appendChild(listDiv);
+
+        const closeBtn = document.createElement("button");
+        closeBtn.className = "primary-btn";
+        closeBtn.style.width = "100%";
+        closeBtn.textContent = "Cerrar los ojos";
+        closeBtn.addEventListener("click", () => {
+            sendNightActionToFirebase(action.id, "skip");
+        });
+        container.appendChild(closeBtn);
+
+        return; 
+    }
+    // --- FIN INTERFAZ MÉDIUM ---
 
     // UI para el resto de roles (Vidente, Lobos, etc.)
     const title = document.createElement("p");
@@ -3340,7 +3374,7 @@ const ROUND_1_ACTIONS = [
             "El Detective elige a un jugador.",
         type: "role",
         requiresRole: "detective",
-        targetPlayers: 1
+        targetPlayers: 2
     },
 
     {
@@ -3874,25 +3908,17 @@ function renderActionContent(action, container, game) {
     const currentDecision = game.nightActions && game.nightActions[action.id];
 
     if (currentDecision === "skip") {
-        title.innerHTML = `<strong style="color:#d98e8e;">Ha decidido NO usar su poder.</strong><br>Pulsa <strong>Validar Acción</strong> para continuar en silencio.`;
+        title.innerHTML = `<strong style="color:#d98e8e;">Ha cerrado los ojos / NO ha usado poder.</strong><br>Pulsa <strong>Validar Acción</strong> para continuar.`;
         container.appendChild(title);
         return; 
     }
 
-    // --- INTERFAZ BRUJA NARRADOR ---
     if (action.id === "witch") {
-        title.innerHTML = `Esperando a que <strong>La Bruja</strong> tome sus decisiones...<br><br><span style="font-size:0.85rem; color:#aaa6b8;">(Elegirá en su móvil. Opcionalmente puedes forzar "Pasar").</span>`;
-        
+        title.innerHTML = `Esperando a que <strong>La Bruja</strong> tome sus decisiones...<br><br><span style="font-size:0.85rem; color:#aaa6b8;">(Elegirá en su móvil).</span>`;
         if (currentDecision && currentDecision !== "skip") {
             let msg = `<strong style="color:#9fd0a5;">¡Decisiones recibidas!</strong><br><br>`;
-            if (currentDecision.revive) {
-                const revName = game.players[currentDecision.revive]?.name;
-                msg += `💉 Ha revivido a: <strong>${revName}</strong><br>`;
-            }
-            if (currentDecision.kill) {
-                const killName = game.players[currentDecision.kill]?.name;
-                msg += `☠️ Ha matado a: <strong>${killName}</strong><br>`;
-            }
+            if (currentDecision.revive) msg += `💉 Ha revivido a: <strong>${game.players[currentDecision.revive]?.name}</strong><br>`;
+            if (currentDecision.kill) msg += `☠️ Ha matado a: <strong>${game.players[currentDecision.kill]?.name}</strong><br>`;
             msg += `<br>Pulsa <strong>Validar Acción</strong> para confirmar.`;
             title.innerHTML = msg;
         }
@@ -3901,16 +3927,78 @@ function renderActionContent(action, container, game) {
         const skipBtn = document.createElement("button");
         skipBtn.className = "action-player-btn";
         skipBtn.textContent = "Forzar: No usar pociones";
-        skipBtn.dataset.targetId = "skip";
         skipBtn.addEventListener("click", () => {
             skipBtn.classList.add("selected");
             title.innerHTML = `Has forzado manualmente que no use pociones.<br>Pulsa <strong>Validar Acción</strong>.`;
         });
         container.appendChild(skipBtn);
-
         return; 
     }
-    // --- FIN INTERFAZ BRUJA NARRADOR ---
+
+    title.innerHTML = `Esperando a que <strong>${action.role}</strong> tome una decisión...<br><br><span style="font-size:0.85rem; color:#aaa6b8;">(El jugador elegirá en su móvil).</span>`;
+    container.appendChild(title);
+
+    const list = document.createElement("div");
+    list.className = "action-player-list";
+
+    let optionsList = [];
+    if (action.targetPlayers) {
+        optionsList = Object.entries(game.players)
+            .filter(([id, p]) => p.alive && !p.host)
+            .map(([id, p]) => ({ id, name: p.name }));
+    } else if (action.targetPool === "village") {
+        const unusedRoles = game.unusedRoles || [];
+        const villageRoles = unusedRoles.filter(role => role !== "wolf" && role !== "shapeshifter" && role !== "lookout" && role !== "magic");
+        optionsList = villageRoles.map((role, idx) => ({ id: `${role}-${idx}`, name: ROLE_INFO[role] ? ROLE_INFO[role].name : role }));
+    }
+
+    // --- NUEVO: Logica para separar los votos de Cupido y Detective ---
+    let selectedIds = [];
+    if (currentDecision && currentDecision !== "skip") {
+        selectedIds = typeof currentDecision === "string" ? currentDecision.split(",") : [currentDecision];
+    }
+    // ------------------------------------------------------------------
+
+    optionsList.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "action-player-btn";
+        btn.textContent = opt.name;
+        btn.dataset.targetId = opt.id; 
+
+        if (selectedIds.includes(opt.id)) {
+            btn.classList.add("selected");
+            btn.style.borderColor = "#9fd0a5"; 
+            
+            let chivatazo = "";
+            if (action.id === "seer") {
+                const targetRole = game.players[opt.id].role;
+                const roleName = ROLE_INFO[targetRole] ? ROLE_INFO[targetRole].name : targetRole;
+                chivatazo = `<br><span style="color:#c7baff; font-size: 1.1rem;">(Hazle una seña: es <strong>${roleName}</strong>)</span>`;
+            } else if (action.id === "detective") {
+                chivatazo = `<br><span style="color:#c7baff; font-size: 1.1rem;">(Piensa si son del mismo bando para hacerle la seña)</span>`;
+            }
+
+            title.innerHTML = `<strong style="color:#9fd0a5;">¡Decisión recibida!</strong><br>Opciones marcadas en verde.${chivatazo}<br><br>Pulsa <strong>Validar Acción</strong> para confirmar.`;
+        }
+
+        btn.addEventListener("click", () => {
+            if (action.targetPlayers === 1 || !action.targetPlayers) {
+                document.querySelectorAll(".action-player-btn").forEach(b => {
+                    b.classList.remove("selected");
+                    b.style.borderColor = "";
+                });
+                btn.classList.add("selected");
+            } else {
+                btn.classList.toggle("selected");
+            }
+            title.innerHTML = `Marcado manualmente.<br>Pulsa <strong>Validar Acción</strong>.`;
+        });
+        list.appendChild(btn);
+    });
+
+    container.appendChild(list);
+}
+
 
     // Lectura del resto de roles
     title.innerHTML = `Esperando a que <strong>${action.role}</strong> tome una decisión...<br><br><span style="font-size:0.85rem; color:#aaa6b8;">(El jugador elegirá en su móvil).</span>`;
