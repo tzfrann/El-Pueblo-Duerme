@@ -1051,3 +1051,66 @@ function generateGameCode() {
 
     return code;
 }
+
+// ==========================================
+// LIMPIAR PARTIDAS CADUCADAS
+// ==========================================
+
+async function cleanupExpiredGames() {
+
+    try {
+
+        const gamesRef =
+            ref(database, "games");
+
+
+        const snapshot =
+            await get(gamesRef);
+
+
+        if (!snapshot.exists()) {
+            return;
+        }
+
+
+        const games =
+            snapshot.val();
+
+
+        const now =
+            Date.now();
+
+
+        for (const [gameCode, game] of Object.entries(games)) {
+
+            if (
+                game.createdAt &&
+                now - game.createdAt >= GAME_DURATION
+            ) {
+
+                console.log(
+                    `Eliminando partida caducada: ${gameCode}`
+                );
+
+
+                await remove(
+                    ref(
+                        database,
+                        `games/${gameCode}`
+                    )
+                );
+            }
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Error limpiando partidas:",
+            error
+        );
+
+    }
+
+}
+cleanupExpiredGames();
