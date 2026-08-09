@@ -2530,7 +2530,6 @@ function showPlayerGameView(game) {
 }
 
 function renderPlayerNightAction(game, action, container) {
-    // 1. Si ya se ha enviado una decisión para esta acción, mostramos que está OK
     const currentDecision = game.nightActions && game.nightActions[action.id];
     
     if (currentDecision) {
@@ -2540,11 +2539,9 @@ function renderPlayerNightAction(game, action, container) {
         return;
     }
     
-    // Reseteamos colores si venía de antes
     container.style.borderColor = "#7b5cff";
     container.style.color = "white";
 
-    // 2. Pintamos el texto de instrucciones
     const title = document.createElement("p");
     title.style.marginBottom = "15px";
     title.innerHTML = `<strong>¡Despierta! Es tu turno.</strong><br>${action.description}`;
@@ -2553,7 +2550,20 @@ function renderPlayerNightAction(game, action, container) {
     const list = document.createElement("div");
     list.className = "action-player-list";
 
-    // 3. Conseguir a quién podemos seleccionar
+    // --- NUEVO: Botón de "Pasar turno" para poderes opcionales ---
+    const optionalRoles = ["seer", "magic", "protector", "mage", "witch"]; // Roles que pueden no hacer nada
+    if (optionalRoles.includes(action.requiresRole)) {
+        const passBtn = document.createElement("button");
+        passBtn.className = "action-player-btn";
+        passBtn.style.backgroundColor = "#4b416f"; // Color distinto para que destaque
+        passBtn.textContent = "No usar poder esta noche";
+        passBtn.addEventListener("click", () => {
+            sendNightActionToFirebase(action.id, "skip");
+        });
+        list.appendChild(passBtn);
+    }
+    // -------------------------------------------------------------
+
     let optionsList = [];
     if (action.targetPlayers) {
         optionsList = Object.entries(game.players)
@@ -2571,7 +2581,6 @@ function renderPlayerNightAction(game, action, container) {
     const amount = action.targetPlayers || 1;
     let selectedIds = [];
 
-    // 4. Pintar los botones
     optionsList.forEach(opt => {
         const btn = document.createElement("button");
         btn.className = "action-player-btn";
@@ -2579,10 +2588,8 @@ function renderPlayerNightAction(game, action, container) {
         
         btn.addEventListener("click", () => {
             if (amount === 1) {
-                // Roles normales: al pulsar, se envía directo (más rápido, sin confirmar)
                 sendNightActionToFirebase(action.id, opt.id);
             } else {
-                // Cupido (tienen que elegir a 2)
                 if (selectedIds.includes(opt.id)) {
                     selectedIds = selectedIds.filter(id => id !== opt.id);
                     btn.classList.remove("selected");
@@ -2591,7 +2598,6 @@ function renderPlayerNightAction(game, action, container) {
                     btn.classList.add("selected");
                 }
                 
-                // Si ya ha seleccionado a los 2, se envía
                 if (selectedIds.length === amount) {
                     sendNightActionToFirebase(action.id, selectedIds.join(","));
                 }
