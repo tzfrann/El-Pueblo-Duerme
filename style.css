@@ -594,3 +594,195 @@ input:focus {
     }
 
 }
+/* ==========================================
+   CONFIGURACIÓN DE PARTIDA
+========================================== */
+
+.setup-section {
+    text-align: left;
+
+    background: #171620;
+
+    border: 1px solid #302d40;
+
+    border-radius: 10px;
+
+    padding: 18px;
+
+    margin-bottom: 18px;
+}
+
+.setup-section h3 {
+    font-size: 1.1rem;
+
+    margin-bottom: 15px;
+
+    color: #e8e4f0;
+}
+
+.setup-help {
+    color: #8f89a3;
+
+    font-size: 0.85rem;
+
+    line-height: 1.4;
+
+    margin-bottom: 15px;
+}
+
+
+/* ------------------------------------------
+   NÚMEROS
+------------------------------------------ */
+
+.number-setting {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #292735;
+}
+
+.number-setting:last-child {
+    border-bottom: none;
+}
+
+.number-setting strong {
+    display: block;
+
+    color: #f2f0f5;
+
+    font-size: 0.95rem;
+}
+
+.number-setting span {
+    display: block;
+
+    color: #817c8f;
+
+    font-size: 0.75rem;
+
+    margin-top: 4px;
+}
+
+.number-setting input {
+    width: 75px;
+
+    padding: 10px;
+
+    text-align: center;
+
+    margin: 0;
+}
+
+
+/* ------------------------------------------
+   ROLES
+------------------------------------------ */
+
+.role-options {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 8px;
+}
+
+.role-option {
+    margin: 0;
+
+    padding: 11px;
+
+    background: #201e2a;
+
+    border: 1px solid #302d40;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    color: #ddd9e5;
+
+    font-size: 0.9rem;
+}
+
+.role-option:hover {
+    border-color: #51496d;
+}
+
+.role-option input {
+    width: auto;
+
+    margin-right: 7px;
+}
+
+
+/* ------------------------------------------
+   REGLAS
+------------------------------------------ */
+
+.switch-option {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin: 0;
+
+    padding: 10px 0;
+
+    color: #ddd9e5;
+
+    cursor: pointer;
+}
+
+.switch-option input {
+    width: auto;
+
+    margin: 0;
+}
+
+
+/* ------------------------------------------
+   ERROR
+------------------------------------------ */
+
+.setup-error {
+    background: #321d25;
+
+    border: 1px solid #6b3544;
+
+    border-radius: 8px;
+
+    padding: 12px;
+
+    margin-bottom: 15px;
+
+    color: #e9a8b7;
+
+    font-size: 0.85rem;
+
+    line-height: 1.4;
+
+    text-align: left;
+}
+
+
+/* ------------------------------------------
+   MÓVIL
+------------------------------------------ */
+
+@media (max-width: 600px) {
+
+    .role-options {
+        grid-template-columns: 1fr;
+    }
+
+}
