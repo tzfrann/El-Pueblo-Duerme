@@ -3657,12 +3657,53 @@ function renderCurrentAction() {
     if (!window.currentGameData) return;
     const game = window.currentGameData;
     
-    const activeActions = getActiveActions(game);
+    const content = document.getElementById("action-content");
 
-    // Si ya no quedan acciones, no hacemos nada (el cambio al día lo hace nextAction)
-    if (game.currentActionIndex >= activeActions.length) {
-        return; 
+    // --- NUEVO: PANTALLA DE DÍA (Resultados de la noche) ---
+    if (game.phase === "day") {
+        document.getElementById("current-round").textContent = game.round;
+        document.getElementById("action-title").textContent = "☀️ El amanecer";
+        document.getElementById("action-icon").textContent = "☀️";
+        document.getElementById("action-role").textContent = "Narrador";
+        document.getElementById("action-number").textContent = "Resolución";
+        document.getElementById("action-total").textContent = "-";
+        document.getElementById("action-progress-fill").style.width = "100%";
+        document.getElementById("action-instruction").textContent = "Comunica al pueblo los resultados de esta noche.";
+        content.innerHTML = "";
+
+        const deaths = game.lastNightDeaths || [];
+        const instruction = document.createElement("p");
+        instruction.className = "action-instruction";
+        
+        if (deaths.length === 0) {
+            instruction.innerHTML = `<strong>¡El pueblo despierta en paz!</strong><br><br>Nadie ha muerto esta noche.<br><br>Anúncialo y pulsa el botón para iniciar la fase de debate y votación.`;
+        } else {
+            let deadNames = deaths.map(id => game.players[id] ? game.players[id].name : "Alguien").join(", ");
+            instruction.innerHTML = `<strong>¡Tragedia en el pueblo!</strong><br><br>Esta noche han muerto: <strong style="color:#d98e8e;">${deadNames}</strong>.<br><br>Anúncialo y pulsa el botón para iniciar la fase de debate y votación.`;
+        }
+        content.appendChild(instruction);
+        
+        const btn = document.getElementById("next-action-btn");
+        btn.textContent = "Iniciar Votación";
+        return;
     }
+
+    // --- NUEVO: PANTALLA DE VOTACIÓN ---
+    if (game.phase === "voting") {
+        document.getElementById("action-title").textContent = "🗳️ Votación del pueblo";
+        document.getElementById("action-icon").textContent = "🗳️";
+        document.getElementById("action-role").textContent = "Pueblo";
+        document.getElementById("action-instruction").textContent = "Los jugadores están debatiendo y votando.";
+        content.innerHTML = "<p class='action-instruction'>Cuando termine el tiempo o todos hayan votado, cierra la votación para pasar a la siguiente noche.</p>";
+        
+        const btn = document.getElementById("next-action-btn");
+        btn.textContent = "Cerrar Votación y Anochecer";
+        return;
+    }
+
+    // --- PANTALLA NORMAL DE NOCHE ---
+    const activeActions = getActiveActions(game);
+    if (game.currentActionIndex >= activeActions.length) return; 
 
     const action = activeActions[game.currentActionIndex];
 
@@ -3678,9 +3719,7 @@ function renderCurrentAction() {
     const percentage = ((game.currentActionIndex + 1) / activeActions.length) * 100;
     document.getElementById("action-progress-fill").style.width = `${percentage}%`;
 
-    const content = document.getElementById("action-content");
     content.innerHTML = "";
-
     renderActionContent(action, content, game);
     updateNextButton(action);
 }
@@ -4135,7 +4174,6 @@ async function nextAction() {
         const selectedBtn = document.querySelector(".action-player-btn.selected");
         let manualTarget = selectedBtn ? selectedBtn.dataset.targetId : null;
 
-        // La decisión final es la que envió el móvil, o la que forzó el narrador a mano
         let finalDecision = game.nightActions ? game.nightActions[currentAction.id] : null;
         if (manualTarget) finalDecision = manualTarget;
 
@@ -4147,7 +4185,6 @@ async function nextAction() {
             if (currentAction.id === "magic-wolf") updates[`usedPowers/magicWolf`] = true;
             if (currentAction.id === "mage") updates[`usedPowers/mage`] = true;
             
-            // Si es la bruja y no pasó de turno, registramos qué pociones gastó
             if (currentAction.id === "witch" && finalDecision !== "skip") {
                 if (finalDecision.revive) updates[`usedPowers/witchRevive`] = true;
                 if (finalDecision.kill) updates[`usedPowers/witchKill`] = true;
@@ -4159,11 +4196,13 @@ async function nextAction() {
         if (isLastAction) {
             if (game.phase === "night") {
                 updates["phase"] = "day";
+                processDawn(game, updates); // <--- AQUÍ LLAMAMOS A LA CALCULADORA
             } else if (game.phase === "voting") {
                 updates["phase"] = "night";
                 updates["round"] = (game.round || 1) + 1;
                 updates["currentActionIndex"] = 0;
                 updates["nightActions"] = null; 
+                updates["lastNightDeaths"] = null;
             }
         } else {
             updates["currentActionIndex"] = game.currentActionIndex + 1;
