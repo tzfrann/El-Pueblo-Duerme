@@ -2454,142 +2454,165 @@ function showGameScreen(game) {
 
 }
 
-
 // ==========================================
 // VISTA JUGADOR
 // ==========================================
 
 function showPlayerGameView(game) {
+    document.getElementById("player-game-view").classList.remove("hidden");
+    document.getElementById("narrator-game-view").classList.add("hidden");
 
-    document
-        .getElementById(
-            "player-game-view"
-        )
-        .classList.remove(
-            "hidden"
-        );
+    const player = game.players && game.players[currentPlayerId];
+    if (!player) return;
 
+    document.getElementById("game-player-name").textContent = player.name;
 
-    document
-        .getElementById(
-            "narrator-game-view"
-        )
-        .classList.add(
-            "hidden"
-        );
+    const role = player.role;
+    const info = ROLE_INFO[role] || {
+        name: role || "Sin cargo",
+        description: "No hay información disponible sobre este cargo."
+    };
 
+    document.getElementById("player-role-name").textContent = info.name;
+    document.getElementById("player-role-description").textContent = info.description;
 
-    const player =
-        game.players &&
-        game.players[currentPlayerId];
-
-
-    if (!player) {
-
-        return;
-
-    }
-
-
-    document
-        .getElementById(
-            "game-player-name"
-        )
-        .textContent =
-            player.name;
-
-
-    const role =
-        player.role;
-
-
-    const info =
-        ROLE_INFO[role] ||
-        {
-
-            name:
-                role || "Sin cargo",
-
-            description:
-                "No hay información disponible sobre este cargo."
-
-        };
-
-
-    document
-        .getElementById(
-            "player-role-name"
-        )
-        .textContent =
-            info.name;
-
-
-    document
-        .getElementById(
-            "player-role-description"
-        )
-        .textContent =
-            info.description;
-
-
-    const statusElement =
-        document.getElementById(
-            "player-status"
-        );
-
-
-    if (
-        player.alive === false
-    ) {
-
-        statusElement.textContent =
-            "Muerto";
-
-
-        statusElement.classList.remove(
-            "alive-status"
-        );
-
-
-        statusElement.classList.add(
-            "dead-status"
-        );
-
+    const statusElement = document.getElementById("player-status");
+    if (player.alive === false) {
+        statusElement.textContent = "Muerto";
+        statusElement.classList.remove("alive-status");
+        statusElement.classList.add("dead-status");
     } else {
-
-        statusElement.textContent =
-            "Vivo";
-
-
-        statusElement.classList.remove(
-            "dead-status"
-        );
-
-
-        statusElement.classList.add(
-            "alive-status"
-        );
-
+        statusElement.textContent = "Vivo";
+        statusElement.classList.remove("dead-status");
+        statusElement.classList.add("alive-status");
     }
 
-
-    const message =
-        document.getElementById(
-            "player-game-message"
-        );
-
-
+    const message = document.getElementById("player-game-message");
+    message.innerHTML = ""; // Limpiamos para poder meter botones
+    
+    // Si está muerto, día o votación, mostramos texto estático
     if (!game.players[currentPlayerId].alive) {
         message.textContent = "Has muerto. No puedes hablar ni interactuar.";
-    } else if (game.phase === "night") {
-        message.textContent = "🌙 El pueblo duerme. Cierra los ojos.";
+        message.style.borderColor = ""; message.style.color = "";
+        return;
     } else if (game.phase === "day") {
         message.textContent = "☀️ El pueblo despierta. Escucha al narrador.";
+        message.style.borderColor = ""; message.style.color = "";
+        return;
     } else if (game.phase === "voting") {
         message.textContent = "🗳️ Es hora de votar. Debatid y tomad una decisión.";
+        message.style.borderColor = ""; message.style.color = "";
+        return;
+    }
+
+    // SI ESTAMOS EN LA NOCHE: Comprobar si es mi turno
+    const activeActions = getActiveActions(game);
+    if (game.currentActionIndex >= activeActions.length) {
+        message.textContent = "🌙 El pueblo duerme. Cierra los ojos.";
+        return;
+    }
+
+    const currentAction = activeActions[game.currentActionIndex];
+    const playerRole = game.players[currentPlayerId].role;
+    
+    // ¿Me toca a mí?
+    const isWolfAction = currentAction.type === "wolves" && ["wolf", "shapeshifter", "lookout", "magic"].includes(playerRole);
+    const isMyRoleAction = currentAction.requiresRole === playerRole;
+    
+    if (isWolfAction || isMyRoleAction) {
+        // ¡Es mi turno! Dibujamos los botones
+        renderPlayerNightAction(game, currentAction, message);
+    } else {
+        // No es mi turno
+        message.textContent = "🌙 El pueblo duerme. Cierra los ojos y espera en silencio.";
+        message.style.borderColor = ""; message.style.color = "";
     }
 }
 
+function renderPlayerNightAction(game, action, container) {
+    // 1. Si ya se ha enviado una decisión para esta acción, mostramos que está OK
+    const currentDecision = game.nightActions && game.nightActions[action.id];
+    
+    if (currentDecision) {
+        container.innerHTML = `<strong>¡Decisión enviada!</strong><br>Espera a que el narrador valide la acción en silencio.`;
+        container.style.borderColor = "#9fd0a5";
+        container.style.color = "#9fd0a5";
+        return;
+    }
+    
+    // Reseteamos colores si venía de antes
+    container.style.borderColor = "#7b5cff";
+    container.style.color = "white";
+
+    // 2. Pintamos el texto de instrucciones
+    const title = document.createElement("p");
+    title.style.marginBottom = "15px";
+    title.innerHTML = `<strong>¡Despierta! Es tu turno.</strong><br>${action.description}`;
+    container.appendChild(title);
+
+    const list = document.createElement("div");
+    list.className = "action-player-list";
+
+    // 3. Conseguir a quién podemos seleccionar
+    let optionsList = [];
+    if (action.targetPlayers) {
+        optionsList = Object.entries(game.players)
+            .filter(([id, p]) => p.alive && !p.host)
+            .map(([id, p]) => ({ id, name: p.name }));
+    } else if (action.targetPool === "village") {
+        const unusedRoles = game.unusedRoles || [];
+        const villageRoles = unusedRoles.filter(role => role !== "wolf" && role !== "shapeshifter" && role !== "lookout" && role !== "magic");
+        optionsList = villageRoles.map((role, idx) => ({ 
+            id: `${role}-${idx}`, 
+            name: ROLE_INFO[role] ? ROLE_INFO[role].name : role 
+        }));
+    }
+    
+    const amount = action.targetPlayers || 1;
+    let selectedIds = [];
+
+    // 4. Pintar los botones
+    optionsList.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "action-player-btn";
+        btn.textContent = opt.name;
+        
+        btn.addEventListener("click", () => {
+            if (amount === 1) {
+                // Roles normales: al pulsar, se envía directo (más rápido, sin confirmar)
+                sendNightActionToFirebase(action.id, opt.id);
+            } else {
+                // Cupido (tienen que elegir a 2)
+                if (selectedIds.includes(opt.id)) {
+                    selectedIds = selectedIds.filter(id => id !== opt.id);
+                    btn.classList.remove("selected");
+                } else if (selectedIds.length < amount) {
+                    selectedIds.push(opt.id);
+                    btn.classList.add("selected");
+                }
+                
+                // Si ya ha seleccionado a los 2, se envía
+                if (selectedIds.length === amount) {
+                    sendNightActionToFirebase(action.id, selectedIds.join(","));
+                }
+            }
+        });
+        list.appendChild(btn);
+    });
+
+    container.appendChild(list);
+}
+
+async function sendNightActionToFirebase(actionId, targetId) {
+    if (!currentGameCode) return;
+    try {
+        await update(ref(database, `games/${currentGameCode}/nightActions`), {
+            [actionId]: targetId
+        });
+    } catch (error) {
+        console.error("Error enviando acción nocturna:", error);
+    }
+}
 
 // ==========================================
 // VISTA NARRADOR
