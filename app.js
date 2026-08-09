@@ -2705,7 +2705,22 @@ function showNarratorGameView(game) {
     renderUnusedRoles(
         game.unusedRoles || []
     );
-
+// Mostrar resumen de acciones al narrador
+    const summaryBox = document.querySelector("#narrator-game-view .game-message");
+    summaryBox.innerHTML = "<strong>Resumen de la Noche:</strong><br><br>";
+    
+    if (game.nightActions && Object.keys(game.nightActions).length > 0) {
+        Object.entries(game.nightActions).forEach(([actionId, targetId]) => {
+            let targetName = targetId;
+            // Si el objetivo es un jugador, mostramos su nombre
+            if (game.players[targetId]) {
+                targetName = game.players[targetId].name;
+            }
+            summaryBox.innerHTML += `► <b>${actionId}</b> eligió a: <b>${targetName}</b><br><br>`;
+        });
+    } else {
+        summaryBox.innerHTML += "Todavía no hay acciones registradas esta noche.";
+    }
 }
 
 
