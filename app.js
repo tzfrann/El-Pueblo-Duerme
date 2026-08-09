@@ -1540,6 +1540,18 @@ document
         }
     );
 
+document
+    .getElementById(
+        "secret-voting"
+    )
+    .addEventListener(
+        "change",
+        event => {
+            gameConfig.secretVoting = event.target.checked;
+            updateConfigurationUI();
+        }
+    );
+
 
 // ==========================================
 // ACTUALIZAR CONFIGURACIÓN
@@ -1611,18 +1623,13 @@ function updateConfigurationUI() {
         )
         .checked =
             gameConfig.revealRoles;
-
+    
     document
-    .getElementById(
-        "secret-voting"
-    )
-    .addEventListener(
-        "change",
-        event => {
-            gameConfig.secretVoting = event.target.checked;
-            updateConfigurationUI();
-        }
-    );
+        .getElementById(
+            "secret-voting"
+        )
+        .checked =
+            gameConfig.secretVoting;
 
     const validation =
         validateConfiguration();
