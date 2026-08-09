@@ -1612,6 +1612,17 @@ function updateConfigurationUI() {
         .checked =
             gameConfig.revealRoles;
 
+    document
+    .getElementById(
+        "secret-voting"
+    )
+    .addEventListener(
+        "change",
+        event => {
+            gameConfig.secretVoting = event.target.checked;
+            updateConfigurationUI();
+        }
+    );
 
     const validation =
         validateConfiguration();
