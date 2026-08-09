@@ -2458,6 +2458,9 @@ function showGameScreen(game) {
 // VISTA JUGADOR
 // ==========================================
 
+// ==========================================
+// VISTA JUGADOR
+// ==========================================
 function showPlayerGameView(game) {
     document.getElementById("player-game-view").classList.remove("hidden");
     document.getElementById("narrator-game-view").classList.add("hidden");
@@ -2488,9 +2491,8 @@ function showPlayerGameView(game) {
     }
 
     const message = document.getElementById("player-game-message");
-    message.innerHTML = ""; // Limpiamos para poder meter botones
+    message.innerHTML = ""; 
     
-    // Si está muerto, día o votación, mostramos texto estático
     if (!game.players[currentPlayerId].alive) {
         message.textContent = "Has muerto. No puedes hablar ni interactuar.";
         message.style.borderColor = ""; message.style.color = "";
@@ -2500,12 +2502,10 @@ function showPlayerGameView(game) {
         message.style.borderColor = ""; message.style.color = "";
         return;
     } else if (game.phase === "voting") {
-        // --- NUEVO: Llamamos a la pantalla de votación ---
         renderPlayerVoting(game, message);
         return;
     }
 
-    // SI ESTAMOS EN LA NOCHE: Comprobar si es mi turno
     const activeActions = getActiveActions(game);
     if (game.currentActionIndex >= activeActions.length) {
         message.textContent = "🌙 El pueblo duerme. Cierra los ojos.";
@@ -2515,20 +2515,20 @@ function showPlayerGameView(game) {
     const currentAction = activeActions[game.currentActionIndex];
     const playerRole = game.players[currentPlayerId].role;
     
-    // ¿Me toca a mí?
-    const isWolfAction = currentAction.type === "wolves" && ["wolf", "shapeshifter", "lookout", "magic"].includes(playerRole);
-    const isMyRoleAction = currentAction.requiresRole === playerRole;
+    // --- NUEVO: Leer la naturaleza original del jugador para los lobos ---
+    const originalRole = game.players[currentPlayerId].originalRole || playerRole;
     
+    const isWolfAction = currentAction.type === "wolves" && ["wolf", "shapeshifter", "lookout", "magic"].includes(originalRole);
+    const isMyRoleAction = currentAction.requiresRole === playerRole;
+    // ---------------------------------------------------------------------
+
     if (isWolfAction || isMyRoleAction) {
-        // ¡Es mi turno! Dibujamos los botones
         renderPlayerNightAction(game, currentAction, message);
     } else {
-        // No es mi turno
         message.textContent = "🌙 El pueblo duerme. Cierra los ojos y espera en silencio.";
         message.style.borderColor = ""; message.style.color = "";
     }
 }
-
 function renderPlayerNightAction(game, action, container) {
     const currentDecision = game.nightActions && game.nightActions[action.id];
     
@@ -4207,26 +4207,33 @@ async function nextAction() {
             
             if (currentAction.id === "seer") updates[`usedPowers/seer`] = true;
             if (currentAction.id === "magic-wolf") updates[`usedPowers/magicWolf`] = true;
-            if (currentAction.id === "mage") updates[`usedPowers/mage`] = true;
+            
+            // --- NUEVO: El Mago reinicia los poderes de la base de datos ---
+            if (currentAction.id === "mage") {
+                if (finalDecision !== "skip") {
+                    // Resetea todo a false, excepto a sí mismo para no poder volver a usarlo
+                    updates[`usedPowers`] = { 
+                        magicWolf: false, seer: false, mage: true, 
+                        witchRevive: false, witchKill: false 
+                    };
+                } else {
+                    // Si pasa de turno, no gasta su poder
+                    updates[`usedPowers/mage`] = false; 
+                }
+            }
+            // ----------------------------------------------------------------
             
             if (currentAction.id === "witch" && finalDecision !== "skip") {
                 if (finalDecision.revive) updates[`usedPowers/witchRevive`] = true;
                 if (finalDecision.kill) updates[`usedPowers/witchKill`] = true;
             }
 
-            // --- NUEVO: ABSORCIÓN DE ROLES (CAMBIAFORMAS Y JOKER) ---
             if ((currentAction.id === "shapeshifter" || currentAction.id === "joker") && finalDecision !== "skip") {
-                // Las sobras vienen en formato "vidente-0", nos quedamos solo con "vidente"
                 const chosenRole = finalDecision.split("-")[0]; 
-                
-                // Buscamos quién es el jugador que acaba de usar esta acción
                 const playerId = Object.keys(game.players).find(id => game.players[id].role === currentAction.requiresRole);
                 
                 if (playerId) {
-                    // 1. Le asignamos su nueva identidad
                     updates[`players/${playerId}/role`] = chosenRole;
-                    
-                    // 2. Quitamos el rol de las sobras para que nadie más lo robe
                     const newUnusedRoles = game.unusedRoles ? [...game.unusedRoles] : [];
                     const roleIndex = newUnusedRoles.indexOf(chosenRole);
                     if (roleIndex > -1) {
@@ -4235,7 +4242,6 @@ async function nextAction() {
                     }
                 }
             }
-            // --------------------------------------------------------
         }
 
         const isLastAction = game.currentActionIndex >= activeActions.length - 1;
@@ -4245,7 +4251,6 @@ async function nextAction() {
                 updates["phase"] = "day";
                 processDawn(game, updates); 
             } else if (game.phase === "voting") {
-                // --- CALCULADORA DE VOTOS ---
                 const votes = game.votes || {};
                 const voteCounts = {};
                 Object.values(votes).forEach(votedId => {
@@ -4270,7 +4275,6 @@ async function nextAction() {
                     updates[`players/${expelledId}/alive`] = false;
                     updates[`players/${expelledId}/deathNight`] = "voting";
                 }
-                // -----------------------------
                 
                 updates["phase"] = "night";
                 updates["round"] = (game.round || 1) + 1;
@@ -4288,7 +4292,6 @@ async function nextAction() {
         console.error("Error al avanzar la acción:", error);
     }
 }
-
 // ------------------------------------------
 // MODIFICAR LISTA DE JUGADORES
 // ------------------------------------------
