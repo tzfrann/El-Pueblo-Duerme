@@ -2350,34 +2350,23 @@ async function confirmConfiguration() {
         // ======================================
 
         const gameUpdates = {
-
-            status:
-                "started",
-
-            config:
-                gameConfig,
-
-            night:
-                1,
-
-            phase:
-                "night",
-
-            initializedAt:
-                Date.now(),
-
-            unusedRoles:
-                unusedRoles,
-
-            nightActions:
-                {},
-
-            deaths:
-                {},
-
-            events:
-                {}
-
+            status: "started",
+            config: gameConfig,
+            round: 1, 
+            phase: "night",
+            currentActionIndex: 0,
+            initializedAt: Date.now(),
+            unusedRoles: unusedRoles,
+            nightActions: {}, 
+            usedPowers: { 
+                magicWolf: false,
+                seer: false,
+                mage: false,
+                witchRevive: false,
+                witchKill: false
+            },
+            deaths: {},
+            events: {}
         };
 
 
@@ -4159,13 +4148,48 @@ document
         nextAction
     );
 
+async function nextAction() {
+    if (!isHost || !currentGameCode) return;
 
-function nextAction() {
+    try {
+        const gameRef = ref(database, `games/${currentGameCode}`);
+        const snapshot = await get(gameRef);
+        const game = snapshot.val();
+        
+        const activeActions = getActiveActions(game); 
+        const currentAction = activeActions[game.currentActionIndex];
+        
+        const selectedBtn = document.querySelector(".action-player-btn.selected");
+        let actionTarget = selectedBtn ? selectedBtn.dataset.targetId : null;
 
-    currentActionIndex++;
+        const updates = {};
+        if (actionTarget) {
+            updates[`nightActions/${currentAction.id}`] = actionTarget;
+            
+            if (currentAction.id === "seer") updates[`usedPowers/seer`] = true;
+            if (currentAction.id === "magic-wolf") updates[`usedPowers/magicWolf`] = true;
+        }
 
-    renderCurrentAction();
+        const isLastAction = game.currentActionIndex >= activeActions.length - 1;
 
+        if (isLastAction) {
+            if (game.phase === "night") {
+                updates["phase"] = "day";
+            } else if (game.phase === "voting") {
+                updates["phase"] = "night";
+                updates["round"] = (game.round || 1) + 1;
+                updates["currentActionIndex"] = 0;
+                updates["nightActions"] = null; 
+            }
+        } else {
+            updates["currentActionIndex"] = game.currentActionIndex + 1;
+        }
+
+        await update(gameRef, updates);
+
+    } catch (error) {
+        console.error("Error al avanzar la acción:", error);
+    }
 }
 
 
