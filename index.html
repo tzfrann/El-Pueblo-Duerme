@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Pueblo Duerme</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <section id="home-screen" class="screen">
+            <h1>El Pueblo Duerme</h1>
+            <p class="subtitle">Un pueblo. Una noche. Nadie está a salvo.</p>
+
+            <div class="menu">
+                <button id="create-game-btn" class="primary-btn">
+                    Crear partida
+                </button>
+
+                <button id="join-game-btn" class="secondary-btn">
+                    Unirse a una partida
+                </button>
+            </div>
+        </section>
+
+
+        <section id="create-screen" class="screen hidden">
+            <button class="back-btn" onclick="showScreen('home-screen')">
+                ← Volver
+            </button>
+
+            <h2>Crear partida</h2>
+
+            <label for="host-name">Tu nombre</label>
+            <input
+                type="text"
+                id="host-name"
+                placeholder="Introduce tu nombre"
+                maxlength="20"
+            >
+
+            <button id="create-confirm-btn" class="primary-btn">
+                Crear partida
+            </button>
+        </section>
+
+
+        <section id="join-screen" class="screen hidden">
+            <button class="back-btn" onclick="showScreen('home-screen')">
+                ← Volver
+            </button>
+
+            <h2>Unirse a una partida</h2>
+
+            <label for="game-code">Código de partida</label>
+            <input
+                type="text"
+                id="game-code"
+                placeholder="Ej. K7F3X"
+                maxlength="5"
+            >
+
+            <label for="player-name">Tu nombre</label>
+            <input
+                type="text"
+                id="player-name"
+                placeholder="Introduce tu nombre"
+                maxlength="20"
+            >
+
+            <button id="join-confirm-btn" class="primary-btn">
+                Unirse
+            </button>
+        </section>
+
+
+        <section id="lobby-screen" class="screen hidden">
+
+            <p class="lobby-label">CÓDIGO DE PARTIDA</p>
+            <div id="game-code-display" class="game-code">
+                K7F3X
+            </div>
+
+            <h2>Sala de espera</h2>
+
+            <div id="players-list" class="players-list">
+                <!-- Los jugadores aparecerán aquí -->
+            </div>
+
+            <button id="start-game-btn" class="primary-btn">
+                Empezar partida
+            </button>
+
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
