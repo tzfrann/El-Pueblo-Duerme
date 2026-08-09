@@ -907,15 +907,27 @@ function listenToGame(gameCode) {
                 // ======================================
 
                 if (
-                    game.status ===
-                    "started"
-                ) {
+    game.status ===
+    "started"
+) {
 
-                    showGameScreen(game);
+    showScreen(
+        "game-screen"
+    );
 
-                    return;
+    // Solo inicializamos el motor si
+    // todavía no hemos empezado esta partida.
 
-                }
+    if (
+        currentRoundActions.length === 0
+    ) {
+
+        initializeGame();
+
+    }
+
+    return;
+}}
 
 
                 // ======================================
