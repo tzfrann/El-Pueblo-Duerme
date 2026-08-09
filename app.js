@@ -3722,7 +3722,6 @@ function renderCurrentAction() {
 // CONTENIDO DE CADA ACCIÓN
 // ------------------------------------------
 function renderActionContent(action, container, game) {
-    // 1. Acciones genéricas del Narrador (ej: El pueblo duerme)
     if (action.type === "narrator") {
         const msg = document.createElement("p");
         msg.className = "action-instruction";
@@ -3731,18 +3730,26 @@ function renderActionContent(action, container, game) {
         return;
     }
 
-    // 2. Interfaz de Validación para Roles
     const title = document.createElement("p");
     title.className = "action-instruction";
-    title.innerHTML = `Esperando a que <strong>${action.role}</strong> tome una decisión...<br><br><span style="font-size:0.85rem; color:#aaa6b8;">(El jugador elegirá en su móvil. También puedes marcarlo tú manualmente si juegan señalando con el dedo).</span>`;
+    
+    const currentDecision = game.nightActions && game.nightActions[action.id];
+
+    // --- NUEVO: ¿Ha decidido pasar turno? ---
+    if (currentDecision === "skip") {
+        title.innerHTML = `<strong style="color:#d98e8e;">Ha decidido NO usar su poder.</strong><br>Pulsa <strong>Validar Acción</strong> para continuar en silencio.`;
+        container.appendChild(title);
+        return; 
+    }
+    // ----------------------------------------
+
+    title.innerHTML = `Esperando a que <strong>${action.role}</strong> tome una decisión...<br><br><span style="font-size:0.85rem; color:#aaa6b8;">(El jugador elegirá en su móvil).</span>`;
     container.appendChild(title);
 
     const list = document.createElement("div");
     list.className = "action-player-list";
 
     let optionsList = [];
-    
-    // Rellenar botones según si es un jugador o sobras del pueblo
     if (action.targetPlayers) {
         optionsList = Object.entries(game.players)
             .filter(([id, p]) => p.alive && !p.host)
@@ -3750,11 +3757,8 @@ function renderActionContent(action, container, game) {
     } else if (action.targetPool === "village") {
         const unusedRoles = game.unusedRoles || [];
         const villageRoles = unusedRoles.filter(role => role !== "wolf" && role !== "shapeshifter" && role !== "lookout" && role !== "magic");
-        optionsList = villageRoles.map((role, idx) => ({ id: `${role}-${idx}`, name: role }));
+        optionsList = villageRoles.map((role, idx) => ({ id: `${role}-${idx}`, name: ROLE_INFO[role] ? ROLE_INFO[role].name : role }));
     }
-
-    // Miramos si ya hay una decisión guardada en Firebase (elegida por el jugador)
-    const currentDecision = game.nightActions && game.nightActions[action.id];
 
     optionsList.forEach(opt => {
         const btn = document.createElement("button");
@@ -3762,14 +3766,22 @@ function renderActionContent(action, container, game) {
         btn.textContent = opt.name;
         btn.dataset.targetId = opt.id; 
 
-        // Si el jugador ya ha elegido esto en su móvil, se ilumina en verde
         if (currentDecision === opt.id) {
             btn.classList.add("selected");
             btn.style.borderColor = "#9fd0a5"; 
-            title.innerHTML = `<strong style="color:#9fd0a5;">¡Decisión recibida!</strong><br>${action.role} ha elegido a ${opt.name}.<br>Pulsa <strong>Validar Acción</strong> para confirmar y continuar.`;
+            
+            // --- NUEVO: Chivatazos para el Narrador ---
+            let chivatazo = "";
+            if (action.id === "seer") {
+                const targetRole = game.players[opt.id].role;
+                const roleName = ROLE_INFO[targetRole] ? ROLE_INFO[targetRole].name : targetRole;
+                chivatazo = `<br><span style="color:#c7baff; font-size: 1.1rem;">(Hazle una seña: es <strong>${roleName}</strong>)</span>`;
+            }
+            // ------------------------------------------
+
+            title.innerHTML = `<strong style="color:#9fd0a5;">¡Decisión recibida!</strong><br>${action.role} ha elegido a ${opt.name}.${chivatazo}<br><br>Pulsa <strong>Validar Acción</strong> para confirmar.`;
         }
 
-        // Fallback: Si el narrador quiere forzarlo él a mano
         btn.addEventListener("click", () => {
             document.querySelectorAll(".action-player-btn").forEach(b => {
                 b.classList.remove("selected");
