@@ -1,0 +1,149 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top, #25213a 0%, #11101a 45%, #08080d 100%);
+    color: #f2f0f5;
+    font-family: Georgia, "Times New Roman", serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    padding: 24px;
+}
+
+.screen {
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+h1 {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+.subtitle {
+    color: #aaa6b8;
+    font-size: 1.1rem;
+    margin-bottom: 45px;
+    font-style: italic;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.primary-btn {
+    background: #7b5cff;
+    color: white;
+}
+
+.secondary-btn {
+    background: #29263a;
+    color: #eee;
+    border: 1px solid #45405c;
+}
+
+.back-btn {
+    background: transparent;
+    color: #aaa6b8;
+    padding: 8px 0;
+    margin-bottom: 30px;
+}
+
+label {
+    display: block;
+    text-align: left;
+    color: #aaa6b8;
+    margin-bottom: 8px;
+    margin-top: 20px;
+}
+
+input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #45405c;
+    background: #171620;
+    color: white;
+    font-size: 1rem;
+    font-family: inherit;
+    outline: none;
+}
+
+input:focus {
+    border-color: #7b5cff;
+}
+
+.screen > .primary-btn {
+    width: 100%;
+    margin-top: 30px;
+}
+
+.lobby-label {
+    color: #8f89a3;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.game-code {
+    font-size: 2.8rem;
+    letter-spacing: 8px;
+    font-weight: bold;
+    color: #a997ff;
+    margin-bottom: 45px;
+}
+
+.players-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.player {
+    background: #171620;
+    border: 1px solid #302d40;
+    border-radius: 8px;
+    padding: 14px;
+    text-align: left;
+}
