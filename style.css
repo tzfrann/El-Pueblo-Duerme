@@ -1287,3 +1287,218 @@ input[type="text"]:focus {
     }
 
 }
+/* ==========================================
+   PANTALLA DE PARTIDA
+========================================== */
+
+.game-screen {
+    width: 100%;
+    text-align: center;
+}
+
+
+/* ==========================================
+   CABECERA DE RONDA
+========================================== */
+
+.game-round-header {
+    margin-bottom: 28px;
+}
+
+.game-round-label {
+    color: #8f89a3;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+}
+
+.game-round-header h2 {
+    margin-bottom: 8px;
+}
+
+.action-description {
+    color: #aaa6b8;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+
+/* ==========================================
+   PROGRESO
+========================================== */
+
+.action-progress {
+    margin-bottom: 25px;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+
+    color: #8f89a3;
+
+    font-size: 0.8rem;
+
+    margin-bottom: 7px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 5px;
+
+    background: #29263a;
+
+    border-radius: 5px;
+
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+
+    width: 0%;
+
+    background: #7b5cff;
+
+    transition: width 0.25s ease;
+}
+
+
+/* ==========================================
+   PANEL DE ACCIÓN
+========================================== */
+
+.action-panel {
+    background: #171620;
+
+    border: 1px solid #302d40;
+
+    border-radius: 12px;
+
+    padding: 28px 20px;
+
+    margin-bottom: 20px;
+}
+
+.action-icon {
+    font-size: 3rem;
+
+    margin-bottom: 15px;
+}
+
+.action-panel h3 {
+    font-size: 1.4rem;
+
+    margin-bottom: 10px;
+}
+
+.action-instruction {
+    color: #aaa6b8;
+
+    font-size: 0.95rem;
+
+    line-height: 1.5;
+}
+
+
+/* ==========================================
+   CONTENIDO DE ACCIÓN
+========================================== */
+
+.action-content {
+    margin-top: 22px;
+}
+
+
+/* ==========================================
+   MENSAJE DEL NARRADOR
+========================================== */
+
+.narrator-message {
+    background: #171620;
+
+    border: 1px solid #4b416f;
+
+    border-radius: 9px;
+
+    padding: 14px;
+
+    margin-bottom: 15px;
+
+    color: #bdb1e8;
+
+    font-size: 0.9rem;
+
+    line-height: 1.45;
+}
+
+
+/* ==========================================
+   SIGUIENTE
+========================================== */
+
+.next-action-btn {
+    width: 100%;
+
+    margin-top: 5px;
+}
+
+
+/* ==========================================
+   ACCIONES CON JUGADORES
+========================================== */
+
+.action-player-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 9px;
+
+    margin-top: 15px;
+}
+
+.action-player-btn {
+    width: 100%;
+
+    background: #29263a;
+
+    border: 1px solid #45405c;
+
+    color: #eee;
+
+    padding: 13px 15px;
+
+    border-radius: 9px;
+
+    text-align: left;
+}
+
+.action-player-btn:hover {
+    background: #363149;
+}
+
+.action-player-btn.selected {
+    background: #7b5cff;
+
+    border-color: #7b5cff;
+
+    color: white;
+}
+
+
+/* ==========================================
+   MÓVIL
+========================================== */
+
+@media (max-width: 600px) {
+
+    .action-panel {
+        padding: 24px 16px;
+    }
+
+    .action-icon {
+        font-size: 2.6rem;
+    }
+
+}
