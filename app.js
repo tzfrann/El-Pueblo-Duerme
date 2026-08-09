@@ -4184,6 +4184,85 @@ async function nextAction() {
 // elemento visual de la sala.
 // ------------------------------------------
 
+// ==========================================
+// CALCULADORA DEL AMANECER
+// ==========================================
+function processDawn(game, updates) {
+    const nightActions = game.nightActions || {};
+    const players = game.players || {};
+    let killedThisNight = [];
+
+    // 1. Recoger objetivos
+    const wolfTarget = nightActions["wolves"];
+    const protectorTarget = nightActions["protector"];
+    const witchDecision = nightActions["witch"];
+    
+    let witchKill = null;
+    let witchRevive = null;
+    if (witchDecision && witchDecision !== "skip") {
+        witchKill = witchDecision.kill;
+        witchRevive = witchDecision.revive;
+    }
+
+    // 2. Procesar ataque de los Lobos
+    if (wolfTarget && wolfTarget !== "skip") {
+        // Muere si no lo salva el protector ni lo revive la bruja
+        if (protectorTarget !== wolfTarget && witchRevive !== wolfTarget) {
+            if (!killedThisNight.includes(wolfTarget)) killedThisNight.push(wolfTarget);
+        }
+    }
+
+    // 3. Procesar veneno de la Bruja
+    if (witchKill && witchKill !== "skip") {
+        // Asumimos que el protector también puede parar a la bruja
+        if (protectorTarget !== witchKill) {
+            if (!killedThisNight.includes(witchKill)) killedThisNight.push(witchKill);
+        }
+    }
+
+    // 4. Lógica de Enamorados (Cupido)
+    const lovers = nightActions["cupid"]; 
+    if (lovers && lovers !== "skip" && typeof lovers === "string") {
+        const [lover1, lover2] = lovers.split(",");
+        // Si muere uno, el otro muere de pena automáticamente
+        if (killedThisNight.includes(lover1) && !killedThisNight.includes(lover2)) {
+            killedThisNight.push(lover2);
+        } else if (killedThisNight.includes(lover2) && !killedThisNight.includes(lover1)) {
+            killedThisNight.push(lover1);
+        }
+    }
+
+    // 5. Aplicar muertes y buscar roles especiales para el Aprendiz
+    let apprenticeId = null;
+    Object.entries(players).forEach(([id, p]) => {
+        if (p.role === "apprentice" && p.alive) apprenticeId = id;
+    });
+
+    let deadSpecialRoles = [];
+
+    killedThisNight.forEach(victimId => {
+        if (players[victimId]) {
+            updates[`players/${victimId}/alive`] = false;
+            updates[`players/${victimId}/deathNight`] = game.round;
+            
+            const role = players[victimId].role;
+            // Si el muerto es del pueblo y tiene un rol útil, lo guardamos
+            if (role !== "villager" && role !== "wolf" && role !== "apprentice") {
+                deadSpecialRoles.push(role);
+            }
+        }
+    });
+
+    // 6. Evolución del Aprendiz
+    if (apprenticeId && deadSpecialRoles.length > 0) {
+         // Se convierte en el primer rol especial que haya muerto esa noche
+         updates[`players/${apprenticeId}/role`] = deadSpecialRoles[0];
+    }
+
+    // Guardamos la lista de muertos para que el Narrador la lea
+    updates["lastNightDeaths"] = killedThisNight;
+}
+
 function addPlayerIdsToLobby() {
 
     const players =
