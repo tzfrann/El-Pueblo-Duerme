@@ -66,6 +66,11 @@ let isHost = false;
 
 let currentGameListener = null;
 
+// ==========================================
+// CONFIGURACIÓN DE PARTIDAS
+// ==========================================
+
+const GAME_DURATION = 3 * 60 * 60 * 1000; // 3 horas
 
 // ==========================================
 // NAVEGACIÓN
@@ -204,6 +209,8 @@ async function createGame() {
 
             status: "waiting",
 
+            createdAt: Date.now(),
+
             players: {
 
                 [playerId]: {
@@ -213,7 +220,6 @@ async function createGame() {
                     host: true
 
                 }
-
             }
 
         };
