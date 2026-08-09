@@ -906,27 +906,29 @@ function listenToGame(gameCode) {
                 // ======================================
 
                 if (
-    game.status ===
-    "started"
-) {
+                    game.status ===
+                    "started"
+                ) {
 
-    showScreen(
-        "game-screen"
-    );
+                    showGameScreen(game);
 
-    // Solo inicializamos el motor si
-    // todavía no hemos empezado esta partida.
+                    // Solo inicializamos el motor si
+                    // todavía no hemos empezado esta partida.
 
-    if (
-        currentRoundActions.length === 0
-    ) {
+                    if (
+                        currentRoundActions.length === 0
+                    ) {
 
-        initializeGame();
+                        initializeGame();
 
-    }
+                    } else {
 
-    return;
-}}
+                        renderCurrentAction();
+
+                    }
+
+                    return;
+                }
 
 
                 // ======================================
@@ -2448,10 +2450,6 @@ function showGameScreen(game) {
     }
 
 }
-
-// ==========================================
-// VISTA JUGADOR
-// ==========================================
 
 // ==========================================
 // VISTA JUGADOR
@@ -4686,7 +4684,7 @@ function renderCurrentAction() {
     
     const content = document.getElementById("action-content");
 
-    // --- NUEVO: PANTALLA DE DÍA (Resultados de la noche) ---
+    // --- PANTALLA DE DÍA (Resultados de la noche) ---
     if (game.phase === "day") {
         document.getElementById("current-round").textContent = game.round;
         document.getElementById("action-title").textContent = "☀️ El amanecer";
@@ -4715,7 +4713,7 @@ function renderCurrentAction() {
         return;
     }
 
-    // --- NUEVO: PANTALLA DE VOTACIÓN ---
+    // --- PANTALLA DE VOTACIÓN ---
     if (game.phase === "voting") {
         document.getElementById("action-title").textContent = "🗳️ Votación del pueblo";
         document.getElementById("action-icon").textContent = "🗳️";
@@ -4837,7 +4835,7 @@ function renderActionContent(action, container, game) {
         optionsList = villageRoles.map((role, idx) => ({ id: `${role}-${idx}`, name: ROLE_INFO[role] ? ROLE_INFO[role].name : role }));
     }
 
-    // --- NUEVO: Logica para separar los votos de Cupido y Detective ---
+    // --- Logica para separar los votos de Cupido y Detective ---
     let selectedIds = [];
     if (currentDecision && currentDecision !== "skip") {
         selectedIds = typeof currentDecision === "string" ? currentDecision.split(",") : [currentDecision];
@@ -4884,103 +4882,6 @@ function renderActionContent(action, container, game) {
     container.appendChild(list);
 }
 
-
-    // Lectura del resto de roles
-    title.innerHTML = `Esperando a que <strong>${action.role}</strong> tome una decisión...<br><br><span style="font-size:0.85rem; color:#aaa6b8;">(El jugador elegirá en su móvil).</span>`;
-    container.appendChild(title);
-
-    const list = document.createElement("div");
-    list.className = "action-player-list";
-
-    let optionsList = [];
-    if (action.targetPlayers) {
-        optionsList = Object.entries(game.players)
-            .filter(([id, p]) => p.alive && !p.host)
-            .map(([id, p]) => ({ id, name: p.name }));
-    } else if (action.targetPool === "village") {
-        const unusedRoles = game.unusedRoles || [];
-        const villageRoles = unusedRoles.filter(role => role !== "wolf" && role !== "shapeshifter" && role !== "lookout" && role !== "magic");
-        optionsList = villageRoles.map((role, idx) => ({ id: `${role}-${idx}`, name: ROLE_INFO[role] ? ROLE_INFO[role].name : role }));
-    }
-
-    optionsList.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.className = "action-player-btn";
-        btn.textContent = opt.name;
-        btn.dataset.targetId = opt.id; 
-
-        if (currentDecision === opt.id) {
-            btn.classList.add("selected");
-            btn.style.borderColor = "#9fd0a5"; 
-            
-            let chivatazo = "";
-            if (action.id === "seer") {
-                const targetRole = game.players[opt.id].role;
-                const roleName = ROLE_INFO[targetRole] ? ROLE_INFO[targetRole].name : targetRole;
-                chivatazo = `<br><span style="color:#c7baff; font-size: 1.1rem;">(Hazle una seña: es <strong>${roleName}</strong>)</span>`;
-            }
-
-            title.innerHTML = `<strong style="color:#9fd0a5;">¡Decisión recibida!</strong><br>${action.role} ha elegido a ${opt.name}.${chivatazo}<br><br>Pulsa <strong>Validar Acción</strong> para confirmar.`;
-        }
-
-        btn.addEventListener("click", () => {
-            document.querySelectorAll(".action-player-btn").forEach(b => {
-                b.classList.remove("selected");
-                b.style.borderColor = "";
-            });
-            btn.classList.add("selected");
-            title.innerHTML = `Has marcado a ${opt.name} manualmente.<br>Pulsa <strong>Validar Acción</strong> para confirmar.`;
-        });
-        list.appendChild(btn);
-    });
-
-    container.appendChild(list);
-}
-
-
-    // --------------------------------------
-    // CAMBIAFORMAS / JOKER
-    // --------------------------------------
-
-    if (
-        action.targetPool ===
-        "village"
-    ) {
-
-        renderVillageRolePool(
-            container
-        );
-
-        return;
-
-    }
-
-
-    // --------------------------------------
-    // RESTO DE ACCIONES
-    // --------------------------------------
-
-    const message =
-        document.createElement(
-            "p"
-        );
-
-    message.className =
-        "action-instruction";
-
-    message.textContent =
-        "El narrador debe resolver esta acción.";
-
-    container.appendChild(
-        message
-    );
-
-}
-
-
-// ------------------------------------------
-// SELECTOR DE JUGADORES
-// Borrado.(?)
 
 // ------------------------------------------
 // OBTENER JUGADORES
@@ -5651,13 +5552,6 @@ async function nextAction() {
     }
 
 }
-// ------------------------------------------
-// MODIFICAR LISTA DE JUGADORES
-// ------------------------------------------
-//
-// Guardamos el ID real del jugador en cada
-// elemento visual de la sala.
-// ------------------------------------------
 
 // ==========================================
 // CALCULADORA DEL AMANECER
@@ -5819,10 +5713,5 @@ function addPlayerIdsToLobby() {
 // INICIAR EL MOTOR CUANDO LA PARTIDA
 // PASA A "STARTED"
 // ------------------------------------------
-//
-// IMPORTANTE:
-// Sustituimos la parte correspondiente de
-// listenToGame para llamar a initializeGame().
-// ------------------------------------------
 cleanupExpiredGames();
-}
+});
