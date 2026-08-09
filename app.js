@@ -3648,46 +3648,64 @@ function renderCurrentAction() {
 // ------------------------------------------
 // CONTENIDO DE CADA ACCIÓN
 // ------------------------------------------
+function renderActionContent(action, container, game) {
+    if (action.type === "narrator") return;
 
-function renderActionContent(
-    action,
-    container
-) {
-
-    // --------------------------------------
-    // ACCIÓN DEL NARRADOR
-    // --------------------------------------
-
-    if (
-        action.type ===
-        "narrator"
-    ) {
-
+    if (action.targetPlayers) {
+        const alivePlayers = Object.entries(game.players)
+            .filter(([id, p]) => p.alive && !p.host)
+            .map(([id, p]) => ({ id, name: p.name }));
+            
+        renderSelector(container, alivePlayers, action.targetPlayers, "Selecciona a un jugador.");
         return;
-
     }
 
-
-    // --------------------------------------
-    // ACCIONES CON JUGADORES
-    // --------------------------------------
-
-    if (
-        action.targetPlayers
-    ) {
-
-        renderPlayerSelector(
-            container,
-            action.targetPlayers
-        );
-
+    if (action.targetPool === "village") {
+        const unusedRoles = game.unusedRoles || [];
+        const villageRoles = unusedRoles.filter(role => role !== "wolf" && role !== "shapeshifter" && role !== "lookout" && role !== "magic");
+        
+        const options = villageRoles.map((role, idx) => ({ id: `${role}-${idx}`, name: role }));
+        renderSelector(container, options, 1, "Selecciona un cargo sobrante del pueblo.");
         return;
-
     }
 
+    const msg = document.createElement("p");
+    msg.className = "action-instruction";
+    msg.textContent = "El narrador debe resolver esta acción.";
+    container.appendChild(msg);
+}
+
+function renderSelector(container, optionsList, amount, instructionText) {
+    const title = document.createElement("p");
+    title.className = "action-instruction";
+    title.textContent = instructionText;
+    container.appendChild(title);
+
+    const list = document.createElement("div");
+    list.className = "action-player-list";
+
+    optionsList.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "action-player-btn";
+        btn.textContent = opt.name;
+        btn.dataset.targetId = opt.id; 
+
+        btn.addEventListener("click", () => {
+            if (amount === 1) {
+                document.querySelectorAll(".action-player-btn").forEach(b => b.classList.remove("selected"));
+                btn.classList.add("selected");
+            } else {
+                btn.classList.toggle("selected");
+            }
+        });
+        list.appendChild(btn);
+    });
+    container.appendChild(list);
+}
+
 
     // --------------------------------------
-    // CAMBIAPFORMAS / JOKER
+    // CAMBIAFORMAS / JOKER
     // --------------------------------------
 
     if (
