@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>El Pueblo Duerme</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -11,93 +13,259 @@
 
     <main class="container">
 
+        <!-- =========================
+             PANTALLA PRINCIPAL
+        ========================== -->
+
         <section id="home-screen" class="screen">
-            <h1>El Pueblo Duerme</h1>
-            <p class="subtitle">Un pueblo. Una noche. Nadie está a salvo.</p>
+
+            <div class="logo-area">
+                <div class="moon">☾</div>
+
+                <h1>El Pueblo Duerme</h1>
+
+                <p class="subtitle">
+                    Un pueblo. Una noche. Nadie está a salvo.
+                </p>
+            </div>
 
             <div class="menu">
-                <button id="create-game-btn" class="primary-btn">
+
+                <button
+                    id="create-game-btn"
+                    class="primary-btn"
+                >
                     Crear partida
                 </button>
 
-                <button id="join-game-btn" class="secondary-btn">
+                <button
+                    id="join-game-btn"
+                    class="secondary-btn"
+                >
                     Unirse a una partida
                 </button>
+
             </div>
+
         </section>
 
 
+        <!-- =========================
+             CREAR PARTIDA
+        ========================== -->
+
         <section id="create-screen" class="screen hidden">
-            <button class="back-btn" onclick="showScreen('home-screen')">
+
+            <button
+                class="back-btn"
+                id="create-back-btn"
+            >
                 ← Volver
             </button>
 
             <h2>Crear partida</h2>
 
-            <label for="host-name">Tu nombre</label>
+            <p class="screen-description">
+                Tú serás el narrador de esta partida.
+            </p>
+
+            <label for="host-name">
+                Tu nombre
+            </label>
+
             <input
                 type="text"
                 id="host-name"
                 placeholder="Introduce tu nombre"
                 maxlength="20"
+                autocomplete="off"
             >
 
-            <button id="create-confirm-btn" class="primary-btn">
+            <button
+                id="create-confirm-btn"
+                class="primary-btn"
+            >
                 Crear partida
             </button>
+
         </section>
 
 
+        <!-- =========================
+             UNIRSE A PARTIDA
+        ========================== -->
+
         <section id="join-screen" class="screen hidden">
-            <button class="back-btn" onclick="showScreen('home-screen')">
+
+            <button
+                class="back-btn"
+                id="join-back-btn"
+            >
                 ← Volver
             </button>
 
             <h2>Unirse a una partida</h2>
 
-            <label for="game-code">Código de partida</label>
+            <p class="screen-description">
+                Introduce el código que te ha dado el narrador.
+            </p>
+
+            <label for="game-code">
+                Código de partida
+            </label>
+
             <input
                 type="text"
                 id="game-code"
-                placeholder="Ej. K7F3X"
+                placeholder="Ej. UV45J"
                 maxlength="5"
+                autocomplete="off"
+                autocapitalize="characters"
             >
 
-            <label for="player-name">Tu nombre</label>
+            <label for="player-name">
+                Tu nombre
+            </label>
+
             <input
                 type="text"
                 id="player-name"
                 placeholder="Introduce tu nombre"
                 maxlength="20"
+                autocomplete="off"
             >
 
-            <button id="join-confirm-btn" class="primary-btn">
+            <button
+                id="join-confirm-btn"
+                class="primary-btn"
+            >
                 Unirse
             </button>
+
         </section>
 
 
+        <!-- =========================
+             SALA DE ESPERA
+        ========================== -->
+
         <section id="lobby-screen" class="screen hidden">
 
-            <p class="lobby-label">CÓDIGO DE PARTIDA</p>
-            <div id="game-code-display" class="game-code">
-                K7F3X
+            <div class="game-header">
+
+                <p class="lobby-label">
+                    CÓDIGO DE PARTIDA
+                </p>
+
+                <div class="code-container">
+
+                    <div
+                        id="game-code-display"
+                        class="game-code"
+                    >
+                        -----
+                    </div>
+
+                    <button
+                        id="copy-code-btn"
+                        class="copy-btn"
+                        title="Copiar código"
+                    >
+                        ⧉
+                    </button>
+
+                </div>
+
             </div>
 
-            <h2>Sala de espera</h2>
 
-            <div id="players-list" class="players-list">
-                <!-- Los jugadores aparecerán aquí -->
+            <div class="lobby-title-row">
+
+                <div>
+                    <h2>Sala de espera</h2>
+
+                    <p id="player-count">
+                        0 jugadores
+                    </p>
+                </div>
+
             </div>
 
-            <button id="start-game-btn" class="primary-btn">
+
+            <div
+                id="players-list"
+                class="players-list"
+            >
+                <!-- Jugadores generados por JavaScript -->
+            </div>
+
+
+            <div
+                id="host-message"
+                class="host-message hidden"
+            >
+                Eres el narrador. Cuando todos estén preparados,
+                puedes comenzar la partida.
+            </div>
+
+
+            <div
+                id="waiting-message"
+                class="waiting-message hidden"
+            >
+                Esperando a que el narrador comience la partida...
+            </div>
+
+
+            <button
+                id="start-game-btn"
+                class="primary-btn start-btn hidden"
+            >
                 Empezar partida
             </button>
+
+
+            <button
+                id="leave-game-btn"
+                class="leave-btn"
+            >
+                Salir de la partida
+            </button>
+
+        </section>
+
+
+        <!-- =========================
+             PANTALLA DE PARTIDA
+        ========================== -->
+
+        <section id="game-screen" class="screen hidden">
+
+            <div class="game-started">
+
+                <div class="moon large-moon">
+                    ☾
+                </div>
+
+                <h2>
+                    La partida comienza
+                </h2>
+
+                <p>
+                    El narrador está preparando la partida...
+                </p>
+
+            </div>
 
         </section>
 
     </main>
 
-    <script type="module" src="app.js"></script>
+
+    <script
+        type="module"
+        src="app.js"
+    ></script>
+
 </body>
 </html>
