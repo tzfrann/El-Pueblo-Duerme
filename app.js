@@ -463,11 +463,17 @@ function listenToGame(gameCode) {
                     snapshot.val();
 
 
+                // --------------------------------------
+                // La partida ya no existe
+                // --------------------------------------
+
                 if (!game) {
 
                     alert(
                         "La partida ya no existe."
                     );
+
+                    resetGameState();
 
                     showScreen("home-screen");
 
@@ -475,20 +481,63 @@ function listenToGame(gameCode) {
                 }
 
 
-                // Si la partida ha empezado
+                // --------------------------------------
+                // Comprobar si la partida ha caducado
+                // --------------------------------------
+
                 if (
-                    game.status === "started" &&
-                    !document
-                        .getElementById("game-screen")
-                        .classList
-                        .contains("hidden")
+                    game.createdAt &&
+                    Date.now() - game.createdAt >= GAME_DURATION
                 ) {
+
+                    if (isHost) {
+
+                        remove(gameRef);
+
+                    } else {
+
+                        alert(
+                            "Esta partida ha caducado."
+                        );
+
+                        resetGameState();
+
+                        showScreen("home-screen");
+                    }
 
                     return;
                 }
 
 
-                // Si empieza la partida
+                // --------------------------------------
+                // Comprobar si seguimos dentro
+                // --------------------------------------
+
+                const players =
+                    game.players || {};
+
+
+                if (
+                    currentPlayerId &&
+                    !players[currentPlayerId]
+                ) {
+
+                    alert(
+                        "Has sido expulsado de la partida."
+                    );
+
+                    resetGameState();
+
+                    showScreen("home-screen");
+
+                    return;
+                }
+
+
+                // --------------------------------------
+                // La partida ha comenzado
+                // --------------------------------------
+
                 if (game.status === "started") {
 
                     showScreen("game-screen");
@@ -496,6 +545,10 @@ function listenToGame(gameCode) {
                     return;
                 }
 
+
+                // --------------------------------------
+                // Sala de espera
+                // --------------------------------------
 
                 renderLobby(game);
 
