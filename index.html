@@ -751,35 +751,122 @@
 
 
 
-    <!-- ==================================================
-         ESPERANDO CONFIGURACIÓN
-    =================================================== -->
+   <!-- =========================
+     PANTALLA DE PARTIDA
+========================== -->
 
-    <section
-        id="waiting-config-screen"
-        class="screen hidden"
-    >
+<section id="game-screen" class="screen hidden">
 
-        <div class="game-started">
+    <div class="game-screen">
 
-            <div class="moon large-moon">
-                ☾
-            </div>
+        <!-- CABECERA -->
 
+        <div class="game-round-header">
 
-            <h2>
-                El narrador está preparando la partida
+            <p class="game-round-label">
+                RONDA <span id="current-round">1</span>
+            </p>
+
+            <h2 id="action-title">
+                El pueblo duerme
             </h2>
 
-
-            <p>
-                Espera un momento...
+            <p id="action-description" class="action-description">
+                Todos los jugadores cierran los ojos.
             </p>
 
         </div>
 
-    </section>
 
+        <!-- PROGRESO -->
+
+        <div class="action-progress">
+
+            <div class="progress-info">
+
+                <span id="action-number">
+                    Acción 1
+                </span>
+
+                <span id="action-total">
+                    de 15
+                </span>
+
+            </div>
+
+            <div class="progress-bar">
+
+                <div
+                    id="action-progress-fill"
+                    class="progress-fill"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- JUGADOR / ACCIÓN -->
+
+        <div
+            id="action-panel"
+            class="action-panel"
+        >
+
+            <div
+                id="action-icon"
+                class="action-icon"
+            >
+                🌙
+            </div>
+
+            <h3 id="action-role">
+                El pueblo duerme
+            </h3>
+
+            <p
+                id="action-instruction"
+                class="action-instruction"
+            >
+                Todos los jugadores deben cerrar los ojos.
+            </p>
+
+
+            <!-- Aquí aparecerán posteriormente
+                 los selectores de jugadores,
+                 cartas, poderes, etc. -->
+
+            <div
+                id="action-content"
+                class="action-content"
+            >
+            </div>
+
+        </div>
+
+
+        <!-- AVISOS -->
+
+        <div
+            id="narrator-message"
+            class="narrator-message hidden"
+        >
+        </div>
+
+
+        <!-- BOTÓN -->
+
+        <button
+            id="next-action-btn"
+            class="primary-btn next-action-btn"
+        >
+            Siguiente
+        </button>
+
+
+    </div>
+
+</section>
 
 
     <!-- ==================================================
