@@ -2457,73 +2457,361 @@ function showGameScreen(game) {
 // VISTA JUGADOR
 // ==========================================
 function showPlayerGameView(game) {
-    document.getElementById("player-game-view").classList.remove("hidden");
-    document.getElementById("narrator-game-view").classList.add("hidden");
 
-    const player = game.players && game.players[currentPlayerId];
-    if (!player) return;
+    document
+        .getElementById("player-game-view")
+        .classList.remove("hidden");
 
-    document.getElementById("game-player-name").textContent = player.name;
+    document
+        .getElementById("narrator-game-view")
+        .classList.add("hidden");
 
-    const role = player.role;
-    const info = ROLE_INFO[role] || {
-        name: role || "Sin cargo",
-        description: "No hay información disponible sobre este cargo."
-    };
 
-    document.getElementById("player-role-name").textContent = info.name;
-    document.getElementById("player-role-description").textContent = info.description;
+    const player =
+        game.players &&
+        game.players[currentPlayerId];
 
-    const statusElement = document.getElementById("player-status");
+
+    if (!player) {
+        return;
+    }
+
+
+    document
+        .getElementById("game-player-name")
+        .textContent =
+            player.name;
+
+
+    const role =
+        player.role;
+
+
+    const info =
+        ROLE_INFO[role] || {
+
+            name:
+                role ||
+                "Sin cargo",
+
+            description:
+                "No hay información disponible para este cargo."
+
+        };
+
+
+    document
+        .getElementById("player-role-name")
+        .textContent =
+            info.name;
+
+
+    document
+        .getElementById("player-role-description")
+        .textContent =
+            info.description;
+
+
+    // --------------------------------------
+    // ESTADO VIVO / MUERTO
+    // --------------------------------------
+
+    const statusElement =
+        document.getElementById(
+            "player-status"
+        );
+
+
     if (player.alive === false) {
-        statusElement.textContent = "Muerto";
-        statusElement.classList.remove("alive-status");
-        statusElement.classList.add("dead-status");
+
+        statusElement.textContent =
+            "Muerto";
+
+        statusElement.classList.remove(
+            "alive-status"
+        );
+
+        statusElement.classList.add(
+            "dead-status"
+        );
+
     } else {
-        statusElement.textContent = "Vivo";
-        statusElement.classList.remove("dead-status");
-        statusElement.classList.add("alive-status");
+
+        statusElement.textContent =
+            "Vivo";
+
+        statusElement.classList.remove(
+            "dead-status"
+        );
+
+        statusElement.classList.add(
+            "alive-status"
+        );
+
     }
 
-    const message = document.getElementById("player-game-message");
-    message.innerHTML = ""; 
-    
-    if (!game.players[currentPlayerId].alive) {
-        message.textContent = "Has muerto. No puedes hablar ni interactuar.";
-        message.style.borderColor = ""; message.style.color = "";
+
+    const message =
+        document.getElementById(
+            "player-game-message"
+        );
+
+
+    message.innerHTML = "";
+
+
+    // --------------------------------------
+    // MUERTO
+    // --------------------------------------
+
+    if (!player.alive) {
+
+        message.textContent =
+            "Has muerto. No puedes hablar ni interactuar.";
+
+        message.style.borderColor = "";
+        message.style.color = "";
+
         return;
-    } else if (game.phase === "day") {
-        message.textContent = "☀️ El pueblo despierta. Escucha al narrador.";
-        message.style.borderColor = ""; message.style.color = "";
-        return;
-    } else if (game.phase === "voting") {
-        renderPlayerVoting(game, message);
-        return;
+
     }
 
-    const activeActions = getActiveActions(game);
-    if (game.currentActionIndex >= activeActions.length) {
-        message.textContent = "🌙 El pueblo duerme. Cierra los ojos.";
+
+    // --------------------------------------
+    // DÍA
+    // --------------------------------------
+
+    if (game.phase === "day") {
+
+        message.textContent =
+            "☀️ El pueblo despierta. Escucha al narrador.";
+
+        message.style.borderColor = "";
+        message.style.color = "";
+
         return;
+
     }
 
-    const currentAction = activeActions[game.currentActionIndex];
-    const playerRole = game.players[currentPlayerId].role;
-    
-    // --- NUEVO: Leer la naturaleza original del jugador para los lobos ---
-    const originalRole = game.players[currentPlayerId].originalRole || playerRole;
-    
-    const isWolfAction = currentAction.type === "wolves" && ["wolf", "shapeshifter", "lookout", "magic"].includes(originalRole);
-    const isMyRoleAction = currentAction.requiresRole === playerRole;
-    // ---------------------------------------------------------------------
 
-    if (isWolfAction || isMyRoleAction) {
-        renderPlayerNightAction(game, currentAction, message);
-    } else {
-        message.textContent = "🌙 El pueblo duerme. Cierra los ojos y espera en silencio.";
-        message.style.borderColor = ""; message.style.color = "";
+    // --------------------------------------
+    // VOTACIÓN
+    // --------------------------------------
+
+    if (game.phase === "voting") {
+
+        renderPlayerVoting(
+            game,
+            message
+        );
+
+        return;
+
     }
+
+
+    // --------------------------------------
+    // ACCIONES NOCTURNAS
+    // --------------------------------------
+
+    const activeActions =
+        getActiveActions(game);
+
+
+    if (
+        game.currentActionIndex >=
+        activeActions.length
+    ) {
+
+        message.textContent =
+            "🌙 El pueblo duerme. Cierra los ojos.";
+
+        return;
+
+    }
+
+
+    const currentAction =
+        activeActions[
+            game.currentActionIndex
+        ];
+
+
+    const playerRole =
+        player.role;
+
+
+    /*
+     * IMPORTANTE:
+     *
+     * originalRole permite que un Lobo
+     * cambiaformas siga participando en
+     * la acción conjunta de los lobos
+     * aunque haya cambiado su cargo.
+     */
+
+    const originalRole =
+        player.originalRole ||
+        playerRole;
+
+
+    const isWolfAction =
+        currentAction.type === "wolves" &&
+        [
+            "wolf",
+            "shapeshifter",
+            "lookout",
+            "magic"
+        ].includes(originalRole);
+
+
+    const isMyRoleAction =
+        currentAction.requiresRole ===
+        playerRole;
+
+
+    // --------------------------------------
+    // ENAMORADOS
+    // --------------------------------------
+
+    if (
+        currentAction.id === "lovers"
+    ) {
+
+        const cupidDecision =
+            game.nightActions &&
+            game.nightActions.cupid;
+
+
+        if (
+            !cupidDecision ||
+            cupidDecision === "skip"
+        ) {
+
+            message.textContent =
+                "🌙 El pueblo duerme. Cierra los ojos.";
+
+            return;
+
+        }
+
+
+        const lovers =
+            typeof cupidDecision === "string"
+                ? cupidDecision.split(",")
+                : [];
+
+
+        if (lovers.length !== 2) {
+
+            message.textContent =
+                "🌙 El pueblo duerme. Cierra los ojos.";
+
+            return;
+
+        }
+
+
+        if (
+            !lovers.includes(
+                currentPlayerId
+            )
+        ) {
+
+            message.textContent =
+                "🌙 El pueblo duerme. Cierra los ojos.";
+
+            message.style.borderColor = "";
+            message.style.color = "";
+
+            return;
+
+        }
+
+
+        const partnerId =
+            lovers.find(
+                id =>
+                    id !== currentPlayerId
+            );
+
+
+        const partner =
+            game.players[partnerId];
+
+
+        if (!partner) {
+
+            message.textContent =
+                "🌙 El pueblo duerme. Cierra los ojos.";
+
+            return;
+
+        }
+
+
+        message.style.borderColor =
+            "#d98eae";
+
+        message.style.color =
+            "white";
+
+
+        message.innerHTML =
+            `
+            <strong>❤️ Estás enamorado/a</strong>
+            <br><br>
+            Tu pareja es:
+            <br>
+            <strong style="font-size:1.3rem; color:#d98eae;">
+                ${partner.name}
+            </strong>
+            <br><br>
+            Ahora podéis veros entre vosotros.
+            <br><br>
+            <span style="font-size:0.9rem; color:#aaa6b8;">
+                Cuando el narrador continúe, volverás a dormir.
+            </span>
+            `;
+
+
+        return;
+
+    }
+
+
+    // --------------------------------------
+    // ACCIÓN PROPIA
+    // --------------------------------------
+
+    if (
+        isWolfAction ||
+        isMyRoleAction
+    ) {
+
+        renderPlayerNightAction(
+            game,
+            currentAction,
+            message
+        );
+
+        return;
+
+    }
+
+
+    // --------------------------------------
+    // EL RESTO DUERME
+    // --------------------------------------
+
+    message.textContent =
+        "🌙 El pueblo duerme. Cierra los ojos y espera en silencio.";
+
+    message.style.borderColor = "";
+    message.style.color = "";
+
 }
+
 function renderPlayerNightAction(game, action, container) {
     const currentDecision = game.nightActions && game.nightActions[action.id];
     
