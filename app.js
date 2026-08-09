@@ -127,11 +127,6 @@ function getDefaultGameConfig() {
     };
 }
 
-    };
-
-}
-
-
 let gameConfig =
     getDefaultGameConfig();
 
@@ -3781,114 +3776,6 @@ function renderCurrentAction() {
     renderActionContent(action, content, game);
     updateNextButton(action);
 }
-
-
-    const action =
-        activeActions[
-            currentActionIndex
-        ];
-
-
-    document
-        .getElementById(
-            "current-round"
-        )
-        .textContent =
-            currentRound;
-
-
-    document
-        .getElementById(
-            "action-title"
-        )
-        .textContent =
-            action.title;
-
-
-    document
-        .getElementById(
-            "action-description"
-        )
-        .textContent =
-            action.description;
-
-
-    document
-        .getElementById(
-            "action-icon"
-        )
-        .textContent =
-            action.icon;
-
-
-    document
-        .getElementById(
-            "action-role"
-        )
-        .textContent =
-            action.role;
-
-
-    document
-        .getElementById(
-            "action-instruction"
-        )
-        .textContent =
-            action.description;
-
-
-    document
-        .getElementById(
-            "action-number"
-        )
-        .textContent =
-            `Acción ${currentActionIndex + 1}`;
-
-
-    document
-        .getElementById(
-            "action-total"
-        )
-        .textContent =
-            `de ${activeActions.length}`;
-
-
-    const percentage =
-        (
-            (currentActionIndex + 1) /
-            activeActions.length
-        ) * 100;
-
-
-    document
-        .getElementById(
-            "action-progress-fill"
-        )
-        .style.width =
-            `${percentage}%`;
-
-
-    const content =
-        document.getElementById(
-            "action-content"
-        );
-
-
-    content.innerHTML = "";
-
-
-    renderActionContent(
-        action,
-        content
-    );
-
-
-    updateNextButton(
-        action
-    );
-
-}
-
 
 // ------------------------------------------
 // CONTENIDO DE CADA ACCIÓN
